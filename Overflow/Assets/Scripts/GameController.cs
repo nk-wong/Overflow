@@ -2,29 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//Defines the datatypes of a card
-public struct Card {
-    public string suit; //Holds the suit of the card
-    public string rank; //Holds the pip of the card
-    public int value; //Holds the numerical value of the card
-
-    //Constructor
-    public Card(string s, string r, int v) {
-        this.suit = s;
-        this.rank = r;
-        this.value = v;
-    }
-    
-    //Prints info about the card
-    public void PrintCard() {
-        Debug.Log(this.rank + " | " + this.suit + " | " + this.value);
-    }
-}
-
 public class GameController : MonoBehaviour {
     
-    public List<Card> deck;
+    public List<Card> deck; //Holds all the cards in the deck pile
+    public List<Card> discard; //Holds all the cards in the discard pile
+    public List<Card> spill; //Holds all the cards in the spill pile
+    public Card stash; //Holds the card in the stash pile
 
+    //Fields to help build the card game objects
+    public GameObject cardPrefab; //Template to build cards
+    public Sprite[] cardFaces; //Holds the image for each card in the deck
+
+    //Fields to help position cards
+    public GameObject deckObj; //The game object representing the deck pile
+    public GameObject discardObj; //The game object representing the discard pile
+    public GameObject spillObj; //The game object representing the spill pile
+    public GameObject stashObj; //The game object representing the stash pile
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -44,8 +38,9 @@ public class GameController : MonoBehaviour {
 
         //Test that the deck is correct
         foreach (Card card in deck) {
-            card.PrintCard();
+            Debug.Log(card.rank + " | " + card.suit + " | " + card.value);
         }
+        PlaceDeck();
     }
 
     //Creates all the card objects for the deck
@@ -70,5 +65,18 @@ public class GameController : MonoBehaviour {
             list[i] = list[j];
             list[j] = temp;
         } 
+    }
+
+    //Places the cards in the deck pile and instantiates game objects for each card
+    public void PlaceDeck() {
+        float zOffset = 0.0f;
+        foreach(Card card in deck) {
+            //Create a card object and set its name to match the rank and suit of a card in the deck
+            GameObject newCard = Instantiate(cardPrefab, new Vector3(transform.position.x, transform.position.y, transform.position.z - zOffset), Quaternion.identity); 
+            newCard.name = card.suit + card.rank;
+
+            //Move each card down the z-axis to prevent cards from existing in the same spot
+            zOffset += 0.03f;
+        }
     }
 }
