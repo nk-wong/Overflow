@@ -34,7 +34,7 @@ public class GameController : MonoBehaviour {
     //Prepares a shuffled deck of cards for the start of the game
     public void PlayCards() {
         this.deck = GenerateDeck();
-        this.ShuffleDeck(deck);
+        ShuffleDeck(deck);
 
         //Test that the deck is correct
         foreach (Card card in deck) {
@@ -50,7 +50,7 @@ public class GameController : MonoBehaviour {
         string[] ranks = new string[] {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"}; //The ranks of a deck of playing cards
         for (int i = 0; i < suits.Length; i++) { //Each suit
             for (int j = 0; j < ranks.Length; j++) { //Each rank
-                newDeck.Add(new Card(suits[i], ranks[j], j+1)); //Create card and add to deck
+                newDeck.Add(new Card(ranks[j], suits[i], j+1)); //Create card and add to deck
             }
         }
         return newDeck;
@@ -72,11 +72,36 @@ public class GameController : MonoBehaviour {
         float zOffset = 0.0f;
         foreach(Card card in deck) {
             //Create a card object and set its name to match the rank and suit of a card in the deck
-            GameObject newCard = Instantiate(cardPrefab, new Vector3(transform.position.x, transform.position.y, transform.position.z - zOffset), Quaternion.identity); 
-            newCard.name = card.suit + card.rank;
+            GameObject newCard = Instantiate(cardPrefab, new Vector3(deckObj.transform.position.x, deckObj.transform.position.y, deckObj.transform.position.z - zOffset), Quaternion.identity); 
+            newCard.name = card.rank + card.suit;
+
+            //Have the card set its game object to the newly created game object
+            card.SetObject();
 
             //Move each card down the z-axis to prevent cards from existing in the same spot
             zOffset += 0.03f;
+        }
+    }
+
+    /*
+    //Moves a card from one position to another position and updates the game decks accordingly
+    public void MoveCard(GameObject origPos, GameObject newPos, List<Card> origDeck, List<Card> newDeck) {
+        //The card has its position and rotation set to the game object that it is moving to
+        origPos.transform.position = newPos.transform.position;
+        origPos.transform.rotation = newPos.transform.rotation;
+
+        //Move the card from its current deck to the new deck
+        newDeck.Add(origDeck.RemoveAt(origDeck.Count - 1));
+    }
+    */
+
+    //Debugging function to test synchronization between image and data of cards
+    private void PrintList(List<Card> list) {
+        foreach (Card card in list) {
+            Debug.Log(card.rank + card.suit);
+            Debug.Log(card.myObj.name);
+            Debug.Log(card.myObj.GetComponent<CardDisplay>().card.rank);
+            Debug.Log(card.myObj.GetComponent<CardDisplay>().card.suit);
         }
     }
 }
