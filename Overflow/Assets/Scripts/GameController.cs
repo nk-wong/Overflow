@@ -5,9 +5,11 @@ using UnityEngine;
 public class GameController : MonoBehaviour {
     
     public List<Card> deck; //Holds all the cards in the deck pile
-    public List<Card> discard; //Holds all the cards in the discard pile
-    public List<Card> spill; //Holds all the cards in the spill pile
+    public List<Card> discard = new List<Card>(); //Holds all the cards in the discard pile
+    public List<Card> spill = new List<Card>(); //Holds all the cards in the spill pile
     public Card stash; //Holds the card in the stash pile
+
+    public List<Card> hands = new List<Card>(); //Holds the cards in all the players' hands
 
     //Fields to help build the card game objects
     public GameObject cardPrefab; //Template to build cards
@@ -18,6 +20,10 @@ public class GameController : MonoBehaviour {
     public GameObject discardObj; //The game object representing the discard pile
     public GameObject spillObj; //The game object representing the spill pile
     public GameObject stashObj; //The game object representing the stash pile
+    public GameObject[] playerObjs; //The game objects representing the players
+
+    //Game constants
+    private readonly int NUM_PLAYERS = 4;
     
     // Start is called before the first frame update
     void Start()
@@ -41,6 +47,7 @@ public class GameController : MonoBehaviour {
             Debug.Log(card.rank + " | " + card.suit + " | " + card.value);
         }
         PlaceDeck();
+        StartCoroutine(DealDeck());
     }
 
     //Creates all the card objects for the deck
@@ -83,17 +90,72 @@ public class GameController : MonoBehaviour {
         }
     }
 
-    /*
+    //Deals the cards in the deck pile to each player
+    public IEnumerator DealDeck() {
+        float xOffset = 0.0f;
+        float yOffset = 0.0f;
+        float zOffset = 0.0f;
+        for (int i = 0; i < NUM_PLAYERS; i++) { //Give cards to players
+            for (int j = 0; j < NUM_PLAYERS; j++) { //Give one card to each player
+                Card card = deck[deck.Count - 1]; //Take the top card
+                Vector3 pos = playerObjs[j].transform.position; //Take player position
+                switch (j+1) { //Adjust card position based on player position
+                    case 1: //Player 1 position
+                        pos.x += xOffset;
+                        break;
+                    case 2: //Player 2 position
+                        pos.y -= yOffset;
+                        break;
+                    case 3: //Player 3 position
+                        pos.x -= xOffset;
+                        break;
+                    case 4: //Player 4 position
+                        pos.y += yOffset;
+                        break;
+                    default: //Error
+                        Debug.Log("Unable to deal");
+                        break;
+                }
+                pos.z -= zOffset;
+
+                yield return new WaitForSeconds(0.05f); //Wait before placing a card
+                card.myObj.transform.position = pos; //Set card position
+                card.myObj.transform.rotation = playerObjs[j].transform.rotation; //Align card position to player rotation
+
+                hands.Add(card); //Card is now in hand
+                deck.RemoveAt(deck.Count - 1); //Card is no longer in the deck
+            }
+            xOffset += 1.0f;
+            yOffset += 1.0f;
+            zOffset += 1.0f;
+        }
+        //Place a starting card in the discard pile
+        yield return new WaitForSeconds(0.05f);
+        Card last = deck[deck.Count - 1];
+        last.isFaceUp = true; //Flip the card over
+        last.myObj.transform.position = discardObj.transform.position; //Card moves to the discard pile
+        last.myObj.transform.rotation = discardObj.transform.rotation; //Align card with discard pile
+        discard.Add(last); //Card is now in discard
+        deck.RemoveAt(deck.Count - 1); //Card is no longer in deck
+    }
+
     //Moves a card from one position to another position and updates the game decks accordingly
-    public void MoveCard(GameObject origPos, GameObject newPos, List<Card> origDeck, List<Card> newDeck) {
+    private void MoveCard(Card card, GameObject newPos, List<Card> origDeck, List<Card> newDeck) {
         //The card has its position and rotation set to the game object that it is moving to
-        origPos.transform.position = newPos.transform.position;
-        origPos.transform.rotation = newPos.transform.rotation;
+        card.myObj.transform.position = newPos.transform.position;
+        card.myObj.transform.rotation = newPos.transform.rotation;
 
         //Move the card from its current deck to the new deck
-        newDeck.Add(origDeck.RemoveAt(origDeck.Count - 1));
+        if (origDeck.Remove(card)) {
+            Debug.Log("Remove successful for card: " + card.rank + card.suit);
+            newDeck.Add(card);
+        }
+        else {
+            Debug.Log("Remove unsuccessful for card: " + card.rank + card.suit);
+        }
     }
-    */
+
+
 
     //Debugging function to test synchronization between image and data of cards
     private void PrintList(List<Card> list) {
