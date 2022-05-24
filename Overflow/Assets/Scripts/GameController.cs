@@ -4,12 +4,13 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour {
     
-    public List<Card> deck; //Holds all the cards in the deck pile
-    public List<Card> discard = new List<Card>(); //Holds all the cards in the discard pile
-    public List<Card> spill = new List<Card>(); //Holds all the cards in the spill pile
-    public Card stash; //Holds the card in the stash pile
+    public List<Card> deck { get; private set; } //Holds all the cards in the deck pile
+    public List<Card> discard { get; private set; } //Holds all the cards in the discard pile
+    public List<Card> spill { get; private set; } //Holds all the cards in the spill pile
+    public Card stash { get; private set; } //Holds the card in the stash pile
 
-    public List<Card> hands = new List<Card>(); //Holds the cards in all the players' hands
+    public List<Card> hands { get; private set; } //Holds all the cards in held by the players
+    public List<Card> sets { get; private set; } //Holds all the cards that have been set
 
     //Fields to help build the card game objects
     public GameObject cardPrefab; //Template to build cards
@@ -60,6 +61,13 @@ public class GameController : MonoBehaviour {
                 newDeck.Add(new Card(ranks[j], suits[i], j+1)); //Create card and add to deck
             }
         }
+
+        //Generate the other decks
+        discard = new List<Card>();
+        spill = new List<Card>();
+        hands = new List<Card>();
+        sets = new List<Card>();
+
         return newDeck;
     } 
 

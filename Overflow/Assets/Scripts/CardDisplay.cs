@@ -6,9 +6,10 @@ using UnityEngine;
 public class CardDisplay : MonoBehaviour
 {
 
-    public Card card; //The card data object that matches with the display
+    public Card card { get; private set; } //The card data object that matches with the display
     public Sprite cardFace; //The image of the card when face-up
     public Sprite cardBack; //The image of the card when face-down
+
     private SpriteRenderer spriteRenderer;
     private GameController game;
 

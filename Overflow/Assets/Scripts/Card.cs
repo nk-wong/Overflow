@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class Card
 {
-    public string rank; //Holds the pip of the card
-    public string suit; //Holds the suit of the card
-    public int value; //Holds the numerical value of the card
-    public bool isFaceUp; //Holds whether the card is face-up or face-down
+    public string rank { get; private set; } //Holds the pip of the card
+    public string suit { get; private set; } //Holds the suit of the card
+    public int value { get; private set; } //Holds the numerical value of the card
+    public bool isFaceUp { get; set; } //Holds whether the card is face-up or face-down
 
     public GameObject myObj; //Holds the visual object that the card data is attached to
 
