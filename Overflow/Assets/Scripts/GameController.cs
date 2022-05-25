@@ -25,6 +25,7 @@ public class GameController : MonoBehaviour {
 
     //Game constants
     private readonly int NUM_PLAYERS = 4;
+    private readonly float SPEED_CONSTANT = 100.0f;
     
     // Start is called before the first frame update
     void Start()
@@ -110,6 +111,7 @@ public class GameController : MonoBehaviour {
                 switch (j+1) { //Adjust card position based on player position
                     case 1: //Player 1 position
                         pos.x += xOffset;
+                        card.isFaceUp = true;
                         break;
                     case 2: //Player 2 position
                         pos.y -= yOffset;
@@ -125,11 +127,12 @@ public class GameController : MonoBehaviour {
                         break;
                 }
                 pos.z -= zOffset;
-
-                yield return new WaitForSeconds(0.05f); //Wait before placing a card
-                card.myObj.transform.position = pos; //Set card position
                 card.myObj.transform.rotation = playerObjs[j].transform.rotation; //Align card position to player rotation
-
+                while (Vector3.Distance(card.myObj.transform.position, pos) != 0.0f) {
+                    card.myObj.transform.position = Vector3.MoveTowards(card.myObj.transform.position, pos, SPEED_CONSTANT * Time.deltaTime); //Set card position
+                    yield return null;
+                }
+                
                 hands.Add(card); //Card is now in hand
                 deck.RemoveAt(deck.Count - 1); //Card is no longer in the deck
             }
@@ -138,7 +141,6 @@ public class GameController : MonoBehaviour {
             zOffset += 1.0f;
         }
         //Place a starting card in the discard pile
-        yield return new WaitForSeconds(0.05f);
         Card last = deck[deck.Count - 1];
         last.isFaceUp = true; //Flip the card over
         last.myObj.transform.position = discardObj.transform.position; //Card moves to the discard pile
