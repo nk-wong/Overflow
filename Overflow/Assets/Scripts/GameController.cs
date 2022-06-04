@@ -14,6 +14,7 @@ public class GameController : MonoBehaviour {
 
     //Fields to help build the card game objects
     public GameObject cardPrefab; //Template to build cards
+    public GameObject locationPrefab; //Template to build temporary locations
     public Sprite[] cardFaces; //Holds the image for each card in the deck
 
     //Fields to help position cards
@@ -116,8 +117,17 @@ public class GameController : MonoBehaviour {
         last.isFaceUp = true; //Flip the card over
         yield return StartCoroutine(MoveCard(last, discardObj, discard));
 
-        Card lose = hands[0];
-        StartCoroutine(Snatch(lose));
+        Card lose1 = hands[0];
+        yield return StartCoroutine(Snatch(lose1));
+
+        Card lose2 = hands[0];
+        yield return StartCoroutine(Snatch(lose2));
+
+        Card lose3 = hands[0];
+        yield return StartCoroutine(Snatch(lose3));
+
+        Card lose4 = hands[0];
+        yield return StartCoroutine(Snatch(lose4));
     }
 
     //Moves a card from one position to another position and updates the game decks accordingly
@@ -170,13 +180,20 @@ public class GameController : MonoBehaviour {
     }
 
     //Move a card from hand to discard, take a new card from the top of the deck
-    public IEnumerator Snatch(Card lose) {
-        //Move the card on the top of the deck to the player's hand
-        Card gain = deck[deck.Count - 1];
-        yield return StartCoroutine(MoveCard(gain, lose.myObj, hands));
+    public IEnumerator Snatch(Card handCard) {
+        //Save the position of the hand card
+        GameObject temp = Instantiate(locationPrefab, new Vector3(handCard.myObj.transform.position.x, handCard.myObj.transform.position.y, handCard.myObj.transform.position.z), handCard.myObj.transform.rotation);
 
         //Move the hand card to the discard pile
-        yield return StartCoroutine(MoveCard(lose, discardObj, discard));
+        handCard.isFaceUp = true;
+        yield return StartCoroutine(MoveCard(handCard, discardObj, discard));
+
+        //Move the card on the top of the deck to the player's hand
+        Card gain = deck[deck.Count - 1];
+        yield return StartCoroutine(MoveCard(gain, temp, hands));
+
+        //Remove the temp position
+        Destroy(temp);
     }
 
     //Debugging function to test synchronization between image and data of cards
