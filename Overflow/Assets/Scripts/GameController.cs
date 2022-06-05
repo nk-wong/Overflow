@@ -118,23 +118,24 @@ public class GameController : MonoBehaviour {
         yield return StartCoroutine(MoveCard(last, discardObj, discard));
 
         Card lose1 = hands[0];
-        yield return StartCoroutine(Snatch(lose1));
+        yield return StartCoroutine(Swap(lose1));
 
         Card lose2 = hands[0];
-        yield return StartCoroutine(Snatch(lose2));
+        yield return StartCoroutine(Swap(lose2));
 
         Card lose3 = hands[0];
-        yield return StartCoroutine(Snatch(lose3));
+        yield return StartCoroutine(Swap(lose3));
 
         Card lose4 = hands[0];
-        yield return StartCoroutine(Snatch(lose4));
+        yield return StartCoroutine(Swap(lose4));
+        
     }
 
     //Moves a card from one position to another position and updates the game decks accordingly
-    private IEnumerator MoveCard(Card card, GameObject newPos, List<Card> newDeck) {
+    private IEnumerator MoveCard(Card card, GameObject newPos, List<Card> newDeck, int offset) {
         List<Card> origDeck = FindPile(card); //Find the deck that the card currently resides in
         origDeck.Remove(card); //Remove the card from that deck
-        newDeck.Add(card); //Add the card to the new deck
+        newDeck.Insert(newDeck.Count - offset, card); //Add the card to the new deck
 
         AlignPile(deck, deckObj); //Make sure the deck is showing the correct top card
         AlignPile(discard, discardObj); //Make sure the discard is showing the correct top card
@@ -146,6 +147,10 @@ public class GameController : MonoBehaviour {
             card.myObj.transform.position = Vector3.MoveTowards(card.myObj.transform.position, newPos.transform.position, SPEED_CONSTANT * Time.deltaTime);
             yield return null;
         }
+    }
+
+    private IEnumerator MoveCard(Card card, GameObject newPos, List<Card> newDeck) {
+        yield return StartCoroutine(MoveCard(card, newPos, newDeck, 0));
     }
 
     //Finds the pile that the card is currently residing in
@@ -190,6 +195,23 @@ public class GameController : MonoBehaviour {
 
         //Move the card on the top of the deck to the player's hand
         Card gain = deck[deck.Count - 1];
+        yield return StartCoroutine(MoveCard(gain, temp, hands));
+
+        //Remove the temp position
+        Destroy(temp);
+    }
+
+    //Swap a card from hand with the third card from the top of the deck
+    public IEnumerator Swap(Card handCard) {
+        //Save the position of the hand card
+        GameObject temp = Instantiate(locationPrefab, new Vector3(handCard.myObj.transform.position.x, handCard.myObj.transform.position.y, handCard.myObj.transform.position.z), handCard.myObj.transform.rotation);
+
+        //Move the hand card to the third from top position in the deck
+        handCard.isFaceUp = false;
+        yield return StartCoroutine(MoveCard(handCard, deckObj, deck, 3));
+
+        //Move the third from top card in the deck to the hand
+        Card gain = deck[deck.Count - 3];
         yield return StartCoroutine(MoveCard(gain, temp, hands));
 
         //Remove the temp position
