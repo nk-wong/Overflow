@@ -117,6 +117,21 @@ public class GameController : MonoBehaviour {
         last.isFaceUp = true; //Flip the card over
         yield return StartCoroutine(MoveCard(last, discardObj, discard));
 
+        /*
+        Card lose1 = hands[0];
+        yield return StartCoroutine(Snatch(lose1));
+
+        Card lose2 = hands[0];
+        yield return StartCoroutine(Snatch(lose2));
+
+        Card lose3 = hands[0];
+        yield return StartCoroutine(Snatch(lose3));
+
+        Card lose4 = hands[0];
+        yield return StartCoroutine(Snatch(lose4));
+        */
+
+        /*
         Card lose1 = hands[0];
         yield return StartCoroutine(Swap(lose1));
 
@@ -128,6 +143,15 @@ public class GameController : MonoBehaviour {
 
         Card lose4 = hands[0];
         yield return StartCoroutine(Swap(lose4));
+        */
+        
+        /*
+        yield return StartCoroutine(Spill());
+        yield return StartCoroutine(Spill());
+        yield return StartCoroutine(Spill());
+        yield return StartCoroutine(Spill());
+        */
+
         
     }
 
@@ -137,16 +161,16 @@ public class GameController : MonoBehaviour {
         origDeck.Remove(card); //Remove the card from that deck
         newDeck.Insert(newDeck.Count - offset, card); //Add the card to the new deck
 
-        AlignPile(deck, deckObj); //Make sure the deck is showing the correct top card
-        AlignPile(discard, discardObj); //Make sure the discard is showing the correct top card
-        AlignPile(spill, spillObj); //Make sure the spill is showing the correct top card
-
         //Set card rotation and position
         card.myObj.transform.rotation = newPos.transform.rotation;
         while (Vector3.Distance(card.myObj.transform.position, newPos.transform.position) != 0.0f) {
             card.myObj.transform.position = Vector3.MoveTowards(card.myObj.transform.position, newPos.transform.position, SPEED_CONSTANT * Time.deltaTime);
             yield return null;
         }
+
+        AlignPile(deck, deckObj); //Make sure the deck is showing the correct top card
+        AlignPile(discard, discardObj); //Make sure the discard is showing the correct top card
+        AlignPile(spill, spillObj); //Make sure the spill is showing the correct top card
     }
 
     private IEnumerator MoveCard(Card card, GameObject newPos, List<Card> newDeck) {
@@ -216,6 +240,20 @@ public class GameController : MonoBehaviour {
 
         //Remove the temp position
         Destroy(temp);
+    }
+
+    //Take three cards from the deck and place on spill, if any card in spill matches the top of the discard, spot drawing cards
+    public IEnumerator Spill() {
+        for (int i = 0; i < 3; i++) {
+            Debug.Log("Here");
+            Card card = deck[deck.Count - 1]; //Get card from top of deck
+            card.isFaceUp = true; //Flip the card
+            yield return StartCoroutine(MoveCard(card, spillObj, spill)); //Move to spill pile
+
+            if (card.suit == discard[discard.Count - 1].suit) { //FLipped card matches discard suit, end the spill
+                break;
+            }
+        }
     }
 
     //Debugging function to test synchronization between image and data of cards
