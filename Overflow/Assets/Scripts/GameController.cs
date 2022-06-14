@@ -14,6 +14,7 @@ public class GameController : MonoBehaviour {
 
     //Fields to help build the card game objects
     public GameObject cardPrefab; //Template to build cards
+    public GameObject locationPrefab; //Template to build temporary locations
     public Sprite[] cardFaces; //Holds the image for each card in the deck
 
     //Fields to help position cards
@@ -48,6 +49,7 @@ public class GameController : MonoBehaviour {
         foreach (Card card in deck) {
             Debug.Log(card.rank + " | " + card.suit + " | " + card.value);
         }
+
         PlaceDeck();
         StartCoroutine(DealDeck());
     }
@@ -95,77 +97,164 @@ public class GameController : MonoBehaviour {
             card.SetObject();
 
             //Move each card down the z-axis to prevent cards from existing in the same spot
-            zOffset += 0.03f;
+            zOffset += 0.1f;
         }
     }
 
     //Deals the cards in the deck pile to each player
     public IEnumerator DealDeck() {
-        float xOffset = 0.0f;
-        float yOffset = 0.0f;
-        float zOffset = 0.0f;
         for (int i = 0; i < NUM_PLAYERS; i++) { //Give cards to players
             for (int j = 0; j < NUM_PLAYERS; j++) { //Give one card to each player
                 Card card = deck[deck.Count - 1]; //Take the top card
-                Vector3 pos = playerObjs[j].transform.position; //Take player position
-                switch (j+1) { //Adjust card position based on player position
-                    case 1: //Player 1 position
-                        pos.x += xOffset;
-                        card.isFaceUp = true;
-                        break;
-                    case 2: //Player 2 position
-                        pos.y -= yOffset;
-                        break;
-                    case 3: //Player 3 position
-                        pos.x -= xOffset;
-                        break;
-                    case 4: //Player 4 position
-                        pos.y += yOffset;
-                        break;
-                    default: //Error
-                        Debug.Log("Unable to deal");
-                        break;
+                GameObject obj = playerObjs[j].transform.GetChild(i).gameObject; //Get the player 
+                if (j+1 == 1) { //If dealing to player 1, flip the card
+                    card.isFaceUp = true;
                 }
-                pos.z -= zOffset;
-                card.myObj.transform.rotation = playerObjs[j].transform.rotation; //Align card position to player rotation
-                while (Vector3.Distance(card.myObj.transform.position, pos) != 0.0f) {
-                    card.myObj.transform.position = Vector3.MoveTowards(card.myObj.transform.position, pos, SPEED_CONSTANT * Time.deltaTime); //Set card position
-                    yield return null;
-                }
-                
-                hands.Add(card); //Card is now in hand
-                deck.RemoveAt(deck.Count - 1); //Card is no longer in the deck
+                yield return StartCoroutine(MoveCard(card, obj, hands));
             }
-            xOffset += 1.0f;
-            yOffset += 1.0f;
-            zOffset += 1.0f;
         }
         //Place a starting card in the discard pile
         Card last = deck[deck.Count - 1];
         last.isFaceUp = true; //Flip the card over
-        last.myObj.transform.position = discardObj.transform.position; //Card moves to the discard pile
-        last.myObj.transform.rotation = discardObj.transform.rotation; //Align card with discard pile
-        discard.Add(last); //Card is now in discard
-        deck.RemoveAt(deck.Count - 1); //Card is no longer in deck
+        yield return StartCoroutine(MoveCard(last, discardObj, discard));
+
+        /*
+        Card lose1 = hands[0];
+        yield return StartCoroutine(Snatch(lose1));
+
+        Card lose2 = hands[0];
+        yield return StartCoroutine(Snatch(lose2));
+
+        Card lose3 = hands[0];
+        yield return StartCoroutine(Snatch(lose3));
+
+        Card lose4 = hands[0];
+        yield return StartCoroutine(Snatch(lose4));
+        */
+
+        /*
+        Card lose1 = hands[0];
+        yield return StartCoroutine(Swap(lose1));
+
+        Card lose2 = hands[0];
+        yield return StartCoroutine(Swap(lose2));
+
+        Card lose3 = hands[0];
+        yield return StartCoroutine(Swap(lose3));
+
+        Card lose4 = hands[0];
+        yield return StartCoroutine(Swap(lose4));
+        */
+        
+        /*
+        yield return StartCoroutine(Spill());
+        yield return StartCoroutine(Spill());
+        yield return StartCoroutine(Spill());
+        yield return StartCoroutine(Spill());
+        */
+
+        
     }
 
     //Moves a card from one position to another position and updates the game decks accordingly
-    private void MoveCard(Card card, GameObject newPos, List<Card> origDeck, List<Card> newDeck) {
-        //The card has its position and rotation set to the game object that it is moving to
-        card.myObj.transform.position = newPos.transform.position;
-        card.myObj.transform.rotation = newPos.transform.rotation;
+    private IEnumerator MoveCard(Card card, GameObject newPos, List<Card> newDeck, int offset) {
+        List<Card> origDeck = FindPile(card); //Find the deck that the card currently resides in
+        origDeck.Remove(card); //Remove the card from that deck
+        newDeck.Insert(newDeck.Count - offset, card); //Add the card to the new deck
 
-        //Move the card from its current deck to the new deck
-        if (origDeck.Remove(card)) {
-            Debug.Log("Remove successful for card: " + card.rank + card.suit);
-            newDeck.Add(card);
+        //Set card rotation and position
+        card.myObj.transform.rotation = newPos.transform.rotation;
+        while (Vector3.Distance(card.myObj.transform.position, newPos.transform.position) != 0.0f) {
+            card.myObj.transform.position = Vector3.MoveTowards(card.myObj.transform.position, newPos.transform.position, SPEED_CONSTANT * Time.deltaTime);
+            yield return null;
+        }
+
+        AlignPile(deck, deckObj); //Make sure the deck is showing the correct top card
+        AlignPile(discard, discardObj); //Make sure the discard is showing the correct top card
+        AlignPile(spill, spillObj); //Make sure the spill is showing the correct top card
+    }
+
+    private IEnumerator MoveCard(Card card, GameObject newPos, List<Card> newDeck) {
+        yield return StartCoroutine(MoveCard(card, newPos, newDeck, 0));
+    }
+
+    //Finds the pile that the card is currently residing in
+    private List<Card> FindPile(Card card) {
+        if (deck.Contains(card)) {
+            return deck;
+        }
+        else if (discard.Contains(card)) {
+            return discard;
+        }
+        else if (spill.Contains(card)) {
+            return spill;
+        }
+        else if (hands.Contains(card)) {
+            return hands;
+        }
+        else if (sets.Contains(card)) {
+            return sets;
         }
         else {
-            Debug.Log("Remove unsuccessful for card: " + card.rank + card.suit);
+            return null;
         }
     }
 
+    //Ensures that the piles' cards are stacked correctly
+    private void AlignPile(List<Card> pile, GameObject pos) {
+        float zOffset = 0.0f;
+        for (int i = 0; i < pile.Count; i++) {
+            pile[i].myObj.transform.position = new Vector3(pos.transform.position.x, pos.transform.position.y,  pos.transform.position.z - zOffset);
+            zOffset += 0.1f;
+        }
+    }
 
+    //Move a card from hand to discard, take a new card from the top of the deck
+    public IEnumerator Snatch(Card handCard) {
+        //Save the position of the hand card
+        GameObject temp = Instantiate(locationPrefab, new Vector3(handCard.myObj.transform.position.x, handCard.myObj.transform.position.y, handCard.myObj.transform.position.z), handCard.myObj.transform.rotation);
+
+        //Move the hand card to the discard pile
+        handCard.isFaceUp = true;
+        yield return StartCoroutine(MoveCard(handCard, discardObj, discard));
+
+        //Move the card on the top of the deck to the player's hand
+        Card gain = deck[deck.Count - 1];
+        yield return StartCoroutine(MoveCard(gain, temp, hands));
+
+        //Remove the temp position
+        Destroy(temp);
+    }
+
+    //Swap a card from hand with the third card from the top of the deck
+    public IEnumerator Swap(Card handCard) {
+        //Save the position of the hand card
+        GameObject temp = Instantiate(locationPrefab, new Vector3(handCard.myObj.transform.position.x, handCard.myObj.transform.position.y, handCard.myObj.transform.position.z), handCard.myObj.transform.rotation);
+
+        //Move the hand card to the third from top position in the deck
+        handCard.isFaceUp = false;
+        yield return StartCoroutine(MoveCard(handCard, deckObj, deck, 3));
+
+        //Move the third from top card in the deck to the hand
+        Card gain = deck[deck.Count - 3];
+        yield return StartCoroutine(MoveCard(gain, temp, hands));
+
+        //Remove the temp position
+        Destroy(temp);
+    }
+
+    //Take three cards from the deck and place on spill, if any card in spill matches the top of the discard, spot drawing cards
+    public IEnumerator Spill() {
+        for (int i = 0; i < 3; i++) {
+            Card card = deck[deck.Count - 1]; //Get card from top of deck
+            card.isFaceUp = true; //Flip the card
+            yield return StartCoroutine(MoveCard(card, spillObj, spill)); //Move to spill pile
+
+            if (card.suit == discard[discard.Count - 1].suit) { //Flipped card matches discard suit, end the spill
+                break;
+            }
+        }
+    }
 
     //Debugging function to test synchronization between image and data of cards
     private void PrintList(List<Card> list) {
