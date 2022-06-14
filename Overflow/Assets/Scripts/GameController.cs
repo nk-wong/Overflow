@@ -49,6 +49,7 @@ public class GameController : MonoBehaviour {
         foreach (Card card in deck) {
             Debug.Log(card.rank + " | " + card.suit + " | " + card.value);
         }
+
         PlaceDeck();
         StartCoroutine(DealDeck());
     }
@@ -245,12 +246,11 @@ public class GameController : MonoBehaviour {
     //Take three cards from the deck and place on spill, if any card in spill matches the top of the discard, spot drawing cards
     public IEnumerator Spill() {
         for (int i = 0; i < 3; i++) {
-            Debug.Log("Here");
             Card card = deck[deck.Count - 1]; //Get card from top of deck
             card.isFaceUp = true; //Flip the card
             yield return StartCoroutine(MoveCard(card, spillObj, spill)); //Move to spill pile
 
-            if (card.suit == discard[discard.Count - 1].suit) { //FLipped card matches discard suit, end the spill
+            if (card.suit == discard[discard.Count - 1].suit) { //Flipped card matches discard suit, end the spill
                 break;
             }
         }
