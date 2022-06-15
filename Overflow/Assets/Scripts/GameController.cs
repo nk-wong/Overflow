@@ -106,10 +106,9 @@ public class GameController : MonoBehaviour {
         for (int i = 0; i < NUM_PLAYERS; i++) { //Give cards to players
             for (int j = 0; j < NUM_PLAYERS; j++) { //Give one card to each player
                 Card card = deck[deck.Count - 1]; //Take the top card
-                GameObject obj = playerObjs[j].transform.GetChild(i).gameObject; //Get the player 
-                if (j+1 == 1) { //If dealing to player 1, flip the card
-                    card.isFaceUp = true;
-                }
+                playerObjs[j].GetComponent<Player>().AddToHand(card); //Give the card to the player
+                GameObject obj = playerObjs[j].transform.GetChild(i).gameObject; //Get the player hand position
+                
                 yield return StartCoroutine(MoveCard(card, obj, hands));
             }
         }
@@ -153,6 +152,9 @@ public class GameController : MonoBehaviour {
         yield return StartCoroutine(Spill());
         */
 
+        for (int i = 0; i < NUM_PLAYERS; i++) {
+            playerObjs[i].GetComponent<Player>().PrintHand();
+        }
         
     }
 
