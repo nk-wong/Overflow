@@ -9,12 +9,15 @@ public abstract class Player : MonoBehaviour
     protected Card[] hand = new Card[4]; //The player's hand cards
     protected Card[] set = new Card[5]; //The player's point cards
 
-    public abstract void MakeMove();
+    public abstract IEnumerator Play(); //Runs through the player's turn
+    public abstract void AddToHand(Card card); //Adds the inputted card to the player's hand
+    public abstract void RemoveFromHand(Card card); //Removes the inputted card from the player's hand
 
     // Start is called before the first frame update
     void Start()
     {
-        game = FindObjectOfType<GameController>(); //Initialize the observer state
+        //Initialize the observer state
+        game = FindObjectOfType<GameController>();
     }
 
     // Update is called once per frame
@@ -23,32 +26,28 @@ public abstract class Player : MonoBehaviour
         
     }
 
-    //Adds the inputted card to the player's hand
-    public int AddToHand(Card card) {
-        for (int i = 0; i < hand.Length; i++) { //Find an open spot in the hand
-            if (hand[i] is null) { //Open spot found
-                hand[i] = card;
-                return 0;
+    //Adds an inputted card to an empty spot in a Card array
+    protected bool Add(Card card, Card[] type) {
+        for (int i = 0; i < type.Length; i++) {
+            if (type[i] is null) { //Empty spot found
+                type[i] = card;
+                return true;
             }
         }
 
-        //No free space to add the card, output error
-        Debug.Log(this.name + " does not have space in its hand to add the card(" + card.rank + card.suit + ")");
-        return -1;
+        return false;
     }
 
-    //Removes the specified card from the player's hand
-    private int RemoveFromHand(Card card) {
-        for (int i = 0; i < hand.Length; i++) { //Find the inputted card
-            if (hand[i] == card) { //Card has been found in hand
-                hand[i] = null;
-                return 0;
+    //Removes a specified card from the Card array
+    protected bool Remove(Card card, Card[] type) {
+        for (int i = 0; i < type.Length; i++) {
+            if (!(type[i] is null) && type[i] == card) { //Specified card found
+                type[i] = null;
+                return true;
             }
         }
 
-        //Could not find the card, output error
-        Debug.Log(this.name + " cannot remove the card(" + card.rank + card.suit + ") because it does not exist in the hand");
-        return -1;
+        return false;
     }
 
     //Debugging function to identify which cards are in a player's hand
