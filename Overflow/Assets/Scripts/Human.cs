@@ -57,18 +57,22 @@ public class Human : Player
         //Determine which moves the player can make
         EnableInput();
 
-        //Allow the player to select a move
-        move = true;
+        //Player selects a move
         yield return ChooseMove();
 
-        //Allow the player to select a card
-        select = true;
+        //Player selects a card
         yield return ChooseCard();
 
+        //Player performs the move
+        yield return MakeMove();
+
+        //Player's turn has ended
         DisableInput();
     }
 
     private IEnumerator ChooseMove() {
+        //Allow player to select a move
+        move = true;
         //Wait until a move has been selected
         while (selectedMove == Move.UNDEFINED) {
             yield return null;
@@ -78,12 +82,36 @@ public class Human : Player
     }
 
     private IEnumerator ChooseCard() {
+        //Allow player to select a card
+        select = true;
         //Wait until the selected card matches the rules of the move
         while (!IsValidSelection(selectedMove, selectedCard)) {
             yield return null;
         }
         //Card has been selected, disable the player's ability to select another card
         select = false;
+    }
+
+    public IEnumerator MakeMove() {
+        switch (selectedMove) {
+            case Move.SNATCH:
+                RemoveFromHand(selectedCard);
+                yield return game.Snatch(selectedCard, this);
+                break;
+            case Move.SWAP:
+                RemoveFromHand(selectedCard);
+                yield return game.Swap(selectedCard, this);
+                break;
+            case Move.STASH:
+                //ADD STASH FUNCTION
+                break;
+            case Move.SPILL:
+                yield return game.Spill(this);
+                break;
+            default:
+                Debug.Log(this.name + " could not find a move to perform");
+                break;
+        }
     }
 
     //Enables move buttons based on the state of the game

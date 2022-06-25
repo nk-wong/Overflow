@@ -157,6 +157,10 @@ public class GameController : MonoBehaviour {
         }
 
         yield return playerObjs[0].GetComponent<Player>().Play();
+
+        for (int i = 0; i < NUM_PLAYERS; i++) {
+            playerObjs[i].GetComponent<Player>().PrintHand();
+        }
         
     }
 
@@ -214,7 +218,7 @@ public class GameController : MonoBehaviour {
     }
 
     //Move a card from hand to discard, take a new card from the top of the deck
-    public IEnumerator Snatch(Card handCard) {
+    public IEnumerator Snatch(Card handCard, Player player) {
         //Save the position of the hand card
         GameObject temp = Instantiate(locationPrefab, new Vector3(handCard.myObj.transform.position.x, handCard.myObj.transform.position.y, handCard.myObj.transform.position.z), handCard.myObj.transform.rotation);
 
@@ -224,6 +228,7 @@ public class GameController : MonoBehaviour {
 
         //Move the card on the top of the deck to the player's hand
         Card gain = deck[deck.Count - 1];
+        player.GetComponent<Player>().AddToHand(gain);
         yield return StartCoroutine(MoveCard(gain, temp, hands));
 
         //Remove the temp position
@@ -231,7 +236,7 @@ public class GameController : MonoBehaviour {
     }
 
     //Swap a card from hand with the third card from the top of the deck
-    public IEnumerator Swap(Card handCard) {
+    public IEnumerator Swap(Card handCard, Player player) {
         //Save the position of the hand card
         GameObject temp = Instantiate(locationPrefab, new Vector3(handCard.myObj.transform.position.x, handCard.myObj.transform.position.y, handCard.myObj.transform.position.z), handCard.myObj.transform.rotation);
 
@@ -241,6 +246,7 @@ public class GameController : MonoBehaviour {
 
         //Move the third from top card in the deck to the hand
         Card gain = deck[deck.Count - 3];
+        player.GetComponent<Player>().AddToHand(gain);
         yield return StartCoroutine(MoveCard(gain, temp, hands));
 
         //Remove the temp position
@@ -248,7 +254,7 @@ public class GameController : MonoBehaviour {
     }
 
     //Take three cards from the deck and place on spill, if any card in spill matches the top of the discard, spot drawing cards
-    public IEnumerator Spill() {
+    public IEnumerator Spill(Player player) {
         for (int i = 0; i < 3; i++) {
             Card card = deck[deck.Count - 1]; //Get card from top of deck
             card.isFaceUp = true; //Flip the card
