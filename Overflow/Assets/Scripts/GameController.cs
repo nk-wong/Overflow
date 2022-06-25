@@ -7,10 +7,12 @@ public class GameController : MonoBehaviour {
     public List<Card> deck { get; private set; } //Holds all the cards in the deck pile
     public List<Card> discard { get; private set; } //Holds all the cards in the discard pile
     public List<Card> spill { get; private set; } //Holds all the cards in the spill pile
-    public Card stash { get; private set; } //Holds the card in the stash pile
+    public List<Card> stash { get; private set; } //Holds the card in the stash pile
 
     public List<Card> hands { get; private set; } //Holds all the cards in held by the players
     public List<Card> sets { get; private set; } //Holds all the cards that have been set
+
+    public int stashVal { get; private set; } //Holds the value of the top discard card when a player stashed
 
     //Fields to help build the card game objects
     public GameObject cardPrefab; //Template to build cards
@@ -67,6 +69,7 @@ public class GameController : MonoBehaviour {
 
         //Generate the other decks
         discard = new List<Card>();
+        stash = new List<Card>();
         spill = new List<Card>();
         hands = new List<Card>();
         sets = new List<Card>();
@@ -157,6 +160,9 @@ public class GameController : MonoBehaviour {
         }
 
         yield return playerObjs[0].GetComponent<Player>().Play();
+        yield return playerObjs[0].GetComponent<Player>().Play();
+        yield return playerObjs[0].GetComponent<Player>().Play();
+        yield return playerObjs[0].GetComponent<Player>().Play();
 
         for (int i = 0; i < NUM_PLAYERS; i++) {
             playerObjs[i].GetComponent<Player>().PrintHand();
@@ -179,6 +185,7 @@ public class GameController : MonoBehaviour {
 
         AlignPile(deck, deckObj); //Make sure the deck is showing the correct top card
         AlignPile(discard, discardObj); //Make sure the discard is showing the correct top card
+        AlignPile(stash, stashObj); //Make sure the stash is the showing the correct top card
         AlignPile(spill, spillObj); //Make sure the spill is showing the correct top card
     }
 
@@ -194,6 +201,9 @@ public class GameController : MonoBehaviour {
         else if (discard.Contains(card)) {
             return discard;
         }
+        else if (stash.Contains(card)) {
+            return stash;
+        }
         else if (spill.Contains(card)) {
             return spill;
         }
@@ -204,6 +214,7 @@ public class GameController : MonoBehaviour {
             return sets;
         }
         else {
+            Debug.Log("Could not find the card(" + card.rank + card.suit + ") in any pile");
             return null;
         }
     }
@@ -251,6 +262,31 @@ public class GameController : MonoBehaviour {
 
         //Remove the temp position
         Destroy(temp);
+    }
+
+    public IEnumerator Stash(Card handCard, Player player) {
+        if (stash.Count == 0) { //No card in the stash
+            //Save the position of the hand card
+            GameObject temp = Instantiate(locationPrefab, new Vector3(handCard.myObj.transform.position.x, handCard.myObj.transform.position.y, handCard.myObj.transform.position.z), handCard.myObj.transform.rotation);
+
+            //Move the hand card to the stash pile
+            handCard.isFaceUp = false;
+            yield return StartCoroutine(MoveCard(handCard, stashObj, stash));
+
+            //Set the stash value
+            stashVal = handCard.value;
+
+            //Move the card on the top of the deck to the player's hand
+            Card gain = deck[deck.Count - 1];
+            player.GetComponent<Player>().AddToHand(gain);
+            yield return StartCoroutine(MoveCard(gain, temp, hands));
+
+            //Remove the temp position
+            Destroy(temp);
+        }
+        else { //Steal the currently stashed card
+
+        }
     }
 
     //Take three cards from the deck and place on spill, if any card in spill matches the top of the discard, spot drawing cards

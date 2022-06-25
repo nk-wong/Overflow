@@ -103,7 +103,8 @@ public class Human : Player
                 yield return game.Swap(selectedCard, this);
                 break;
             case Move.STASH:
-                //ADD STASH FUNCTION
+                RemoveFromHand(selectedCard);
+                yield return game.Stash(selectedCard, this);
                 break;
             case Move.SPILL:
                 yield return game.Spill(this);
