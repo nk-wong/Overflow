@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Computer : Player
 {
+    private MemoryCache memory = new MemoryCache(15); //The cards in the discard pile that the computer remembers
+
     //TODO
     public override IEnumerator Play() {
         yield return null;
@@ -20,4 +22,10 @@ public class Computer : Player
             Debug.Log(this.name + " cannot remove the card(" + card.rank + card.suit + ") because it does not exist in the hand");
         }
     }
-}
+
+    public void Notify(Card card) {
+        Debug.Log(this.name + " has noticed the card " + card.rank + card.suit + " has been placed in the discard");
+        memory.Add(card, new List<Card>(hand));
+        memory.PrintCache();
+    }
+ }

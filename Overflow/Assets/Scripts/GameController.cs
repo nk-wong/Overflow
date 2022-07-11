@@ -155,6 +155,7 @@ public class GameController : MonoBehaviour {
         yield return StartCoroutine(Spill());
         */
 
+        /*
         for (int i = 0; i < NUM_PLAYERS; i++) {
             playerObjs[i].GetComponent<Player>().PrintHand();
         }
@@ -166,6 +167,17 @@ public class GameController : MonoBehaviour {
 
         for (int i = 0; i < NUM_PLAYERS; i++) {
             playerObjs[i].GetComponent<Player>().PrintHand();
+        }
+        */
+
+        NotifyAllObservers(last);
+
+        for (int i = 0; i < 29; i++) {
+            Card next = deck[deck.Count - 1];
+            next.isFaceUp = true;
+            yield return MoveCard(next, discardObj, discard);
+            playerObjs[1].GetComponent<Computer>().Notify(next);
+            //NotifyAllObservers(next);
         }
         
     }
@@ -298,6 +310,16 @@ public class GameController : MonoBehaviour {
 
             if (card.suit == discard[discard.Count - 1].suit) { //Flipped card matches discard suit, end the spill
                 break;
+            }
+        }
+    }
+
+    //Notifies computer players that a card has been placed in the discard pile
+    private void NotifyAllObservers(Card card) {
+        for (int i = 0; i < playerObjs.Length; i++) {
+            Computer computer = playerObjs[i].GetComponent<Computer>();
+            if (!(computer is null)) {
+                computer.Notify(card);
             }
         }
     }

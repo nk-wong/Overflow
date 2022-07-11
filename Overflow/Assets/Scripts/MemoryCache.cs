@@ -31,7 +31,7 @@ public class MemoryCache
             int lowestIndex = FindLowestIndex(dominantSuit);
 
             int newCardWeight = (card.suit == dominantSuit ? 13 : 0) - card.value;
-            int oldCardWeight = (cache[lowestIndex].suit == dominantSuit ? 13 : 0) - card.value;
+            int oldCardWeight = (cache[lowestIndex].suit == dominantSuit ? 13 : 0) - cache[lowestIndex].value;
             if (newCardWeight > oldCardWeight) {
                 cache[lowestIndex] = card;
                 return true;
@@ -137,5 +137,16 @@ public class MemoryCache
             }
         }
         return index;
+    }
+
+    //Debugging function used to print out the memory cache
+    public void PrintCache() {
+        Debug.Log("--------------------------------------");
+        for (int i = 0; i < cache.Length; i++) {
+            if (!(cache[i] is null)) {
+                Debug.Log("Slot " + i + " holds the " + cache[i].rank + cache[i].suit);
+            }
+        }
+        Debug.Log("--------------------------------------");
     }
 }
