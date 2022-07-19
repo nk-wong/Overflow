@@ -112,13 +112,13 @@ public class GameController : MonoBehaviour {
                 playerObjs[j].GetComponent<Player>().AddToHand(card); //Give the card to the player
                 GameObject obj = playerObjs[j].transform.GetChild(i).gameObject; //Get the player hand position
                 
-                yield return StartCoroutine(MoveCard(card, obj, hands));
+                yield return MoveCard(card, obj, hands);
             }
         }
         //Place a starting card in the discard pile
         Card last = deck[deck.Count - 1];
         last.isFaceUp = true; //Flip the card over
-        yield return StartCoroutine(MoveCard(last, discardObj, discard));
+        yield return MoveCard(last, discardObj, discard);
 
         /*
         Card lose1 = hands[0];
@@ -169,15 +169,15 @@ public class GameController : MonoBehaviour {
             playerObjs[i].GetComponent<Player>().PrintHand();
         }
         */
+        
 
         NotifyAllObservers(last);
 
-        for (int i = 0; i < 29; i++) {
+        for (int i = 0; i < 30; i++) {
             Card next = deck[deck.Count - 1];
             next.isFaceUp = true;
             yield return MoveCard(next, discardObj, discard);
-            playerObjs[1].GetComponent<Computer>().Notify(next);
-            //NotifyAllObservers(next);
+            NotifyAllObservers(next);
         }
         
     }
@@ -247,12 +247,12 @@ public class GameController : MonoBehaviour {
 
         //Move the hand card to the discard pile
         handCard.isFaceUp = true;
-        yield return StartCoroutine(MoveCard(handCard, discardObj, discard));
+        yield return MoveCard(handCard, discardObj, discard);
 
         //Move the card on the top of the deck to the player's hand
         Card gain = deck[deck.Count - 1];
         player.GetComponent<Player>().AddToHand(gain);
-        yield return StartCoroutine(MoveCard(gain, temp, hands));
+        yield return MoveCard(gain, temp, hands);
 
         //Remove the temp position
         Destroy(temp);
@@ -265,12 +265,12 @@ public class GameController : MonoBehaviour {
 
         //Move the hand card to the third from top position in the deck
         handCard.isFaceUp = false;
-        yield return StartCoroutine(MoveCard(handCard, deckObj, deck, 3));
+        yield return MoveCard(handCard, deckObj, deck, 3);
 
         //Move the third from top card in the deck to the hand
         Card gain = deck[deck.Count - 3];
         player.GetComponent<Player>().AddToHand(gain);
-        yield return StartCoroutine(MoveCard(gain, temp, hands));
+        yield return MoveCard(gain, temp, hands);
 
         //Remove the temp position
         Destroy(temp);
@@ -283,7 +283,7 @@ public class GameController : MonoBehaviour {
 
             //Move the hand card to the stash pile
             handCard.isFaceUp = false;
-            yield return StartCoroutine(MoveCard(handCard, stashObj, stash));
+            yield return MoveCard(handCard, stashObj, stash);
 
             //Set the stash value
             stashVal = handCard.value;
@@ -291,7 +291,7 @@ public class GameController : MonoBehaviour {
             //Move the card on the top of the deck to the player's hand
             Card gain = deck[deck.Count - 1];
             player.GetComponent<Player>().AddToHand(gain);
-            yield return StartCoroutine(MoveCard(gain, temp, hands));
+            yield return MoveCard(gain, temp, hands);
 
             //Remove the temp position
             Destroy(temp);
@@ -306,7 +306,7 @@ public class GameController : MonoBehaviour {
         for (int i = 0; i < 3; i++) {
             Card card = deck[deck.Count - 1]; //Get card from top of deck
             card.isFaceUp = true; //Flip the card
-            yield return StartCoroutine(MoveCard(card, spillObj, spill)); //Move to spill pile
+            yield return MoveCard(card, spillObj, spill); //Move to spill pile
 
             if (card.suit == discard[discard.Count - 1].suit) { //Flipped card matches discard suit, end the spill
                 break;
