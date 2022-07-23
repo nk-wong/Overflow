@@ -118,64 +118,31 @@ public class GameController : MonoBehaviour {
         //Place a starting card in the discard pile
         Card last = deck[deck.Count - 1];
         last.isFaceUp = true; //Flip the card over
-        yield return MoveCard(last, discardObj, discard);
+        yield return MoveToDiscard(last);
 
         /*
-        Card lose1 = hands[0];
-        yield return StartCoroutine(Snatch(lose1));
+        for (int i = 0; i < NUM_PLAYERS; i++) {
+            playerObjs[i].GetComponent<Player>().PrintHand();
+        }
 
-        Card lose2 = hands[0];
-        yield return StartCoroutine(Snatch(lose2));
+        yield return playerObjs[0].GetComponent<Player>().Play();
+        yield return playerObjs[0].GetComponent<Player>().Play();
+        yield return playerObjs[0].GetComponent<Player>().Play();
+        yield return playerObjs[0].GetComponent<Player>().Play();
 
-        Card lose3 = hands[0];
-        yield return StartCoroutine(Snatch(lose3));
-
-        Card lose4 = hands[0];
-        yield return StartCoroutine(Snatch(lose4));
-        */
-
-        /*
-        Card lose1 = hands[0];
-        yield return StartCoroutine(Swap(lose1));
-
-        Card lose2 = hands[0];
-        yield return StartCoroutine(Swap(lose2));
-
-        Card lose3 = hands[0];
-        yield return StartCoroutine(Swap(lose3));
-
-        Card lose4 = hands[0];
-        yield return StartCoroutine(Swap(lose4));
+        for (int i = 0; i < NUM_PLAYERS; i++) {
+            playerObjs[i].GetComponent<Player>().PrintHand();
+        }
         */
         
-        /*
-        yield return StartCoroutine(Spill());
-        yield return StartCoroutine(Spill());
-        yield return StartCoroutine(Spill());
-        yield return StartCoroutine(Spill());
-        */
 
         /*
-        for (int i = 0; i < NUM_PLAYERS; i++) {
-            playerObjs[i].GetComponent<Player>().PrintHand();
-        }
-
-        yield return playerObjs[0].GetComponent<Player>().Play();
-        yield return playerObjs[0].GetComponent<Player>().Play();
-        yield return playerObjs[0].GetComponent<Player>().Play();
-        yield return playerObjs[0].GetComponent<Player>().Play();
-
-        for (int i = 0; i < NUM_PLAYERS; i++) {
-            playerObjs[i].GetComponent<Player>().PrintHand();
-        }
-        */
-
         for (int i = 0; i < 32; i++) {
             Card next = deck[deck.Count - 1];
             next.isFaceUp = true;
             yield return MoveCard(next, discardObj, discard);
         }
-        
+        */
     }
 
     //Moves a card from one position to another position and updates the game decks accordingly
@@ -264,7 +231,7 @@ public class GameController : MonoBehaviour {
 
         //Move the hand card to the discard pile
         handCard.isFaceUp = true;
-        yield return MoveCard(handCard, discardObj, discard);
+        yield return MoveToDiscard(handCard);
 
         //Move the card on the top of the deck to the player's hand
         Card gain = deck[deck.Count - 1];
@@ -282,7 +249,7 @@ public class GameController : MonoBehaviour {
 
         //Move the hand card to the third from top position in the deck
         handCard.isFaceUp = false;
-        yield return MoveCard(handCard, deckObj, deck, 3);
+        yield return MoveToDeck(handCard, 3);
 
         //Move the third from top card in the deck to the hand
         Card gain = deck[deck.Count - 3];
@@ -300,7 +267,7 @@ public class GameController : MonoBehaviour {
 
             //Move the hand card to the stash pile
             handCard.isFaceUp = false;
-            yield return MoveCard(handCard, stashObj, stash);
+            yield return MoveToStash(handCard);
 
             //Set the stash value
             stashVal = handCard.value;
@@ -323,7 +290,7 @@ public class GameController : MonoBehaviour {
         for (int i = 0; i < 3; i++) {
             Card card = deck[deck.Count - 1]; //Get card from top of deck
             card.isFaceUp = true; //Flip the card
-            yield return MoveCard(card, spillObj, spill); //Move to spill pile
+            yield return MoveToSpill(card); //Move to spill pile
 
             if (card.suit == discard[discard.Count - 1].suit) { //Flipped card matches discard suit, end the spill
                 break;
