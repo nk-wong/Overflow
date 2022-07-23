@@ -7,11 +7,17 @@ public class MemoryCache
 {
     private Card[] cache; //Holds cards that will be used to decide moves
 
+    private readonly int MAX_CACHE_SIZE = 52; //The max number of cards that a cache can hold
+
     //Constructor
     public MemoryCache(int size) {
-        //Make a cache with a capacity of the inputted integer
-        cache = new Card[size];
-
+        if (!(size > MAX_CACHE_SIZE)) {
+            //Make a cache with a capacity of the inputted integer
+            cache = new Card[size];
+        }
+        else {
+            Debug.Log("A memory cache of size " + size + " cannot be created because it exceeds the limit of " + MAX_CACHE_SIZE);
+        }
     }
 
     public bool Add(Card card, List<Card> gameState) {
@@ -28,10 +34,10 @@ public class MemoryCache
         }
         else {
             string dominantSuit = FindDominantSuit(gameState);
-            int lowestIndex = FindLowestIndex(dominantSuit);
+            int lowestIndex = FindLowestIndex(dominantSuit, gameState);
 
-            int newCardWeight = (card.suit == dominantSuit ? 13 : 0) - card.value;
-            int oldCardWeight = (cache[lowestIndex].suit == dominantSuit ? 13 : 0) - cache[lowestIndex].value;
+            int newCardWeight = card.suit == dominantSuit ? MAX_CACHE_SIZE : (CountSuit(card.suit, gameState) - card.value);
+            int oldCardWeight = cache[lowestIndex].suit == dominantSuit ? MAX_CACHE_SIZE : (CountSuit(cache[lowestIndex].suit, gameState) - cache[lowestIndex].value);
             if (newCardWeight > oldCardWeight) {
                 cache[lowestIndex] = card;
                 return true;
@@ -57,11 +63,16 @@ public class MemoryCache
         }
     }
 
-    //Counts the number of cards in the cache that match the inputted suit
-    private int CountSuit(string suit) {
+    //Counts the number of cards in the cache and game that match the inputted suit
+    public int CountSuit(string suit, List<Card> gameState) {
         int count = 0;
+        for (int i = 0; i < gameState.Count; i++) {
+            if (gameState[i].suit == suit) { //Found a card in the game that matches in suit, increment count
+                count++;
+            }
+        }
         for (int i = 0; i < cache.Length; i++) {
-            if (!(cache[i] is null) && cache[i].suit == suit) { //Found a card that matches in suit, increment count
+            if (!(cache[i] is null) && cache[i].suit == suit) { //Found a card in the cache that matches in suit, increment count
                 count++;
             }
         }
@@ -126,11 +137,11 @@ public class MemoryCache
     }
 
     //Determine which index in the cache holds the least valuable card
-    private int FindLowestIndex(string dominantSuit) {
+    private int FindLowestIndex(string dominantSuit, List<Card> gameState) {
         int lowest = Int32.MaxValue;
         int index = 0;
         for (int i = 0; i < cache.Length; i++) {
-            int weight = (cache[i].suit == dominantSuit ? 13 : 0) - cache[i].value;
+            int weight = cache[i].suit == dominantSuit ? MAX_CACHE_SIZE : (CountSuit(cache[i].suit, gameState) - cache[i].value);
             if (weight < lowest) {
                 lowest = weight;
                 index = i;

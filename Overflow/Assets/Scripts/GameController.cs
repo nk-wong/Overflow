@@ -173,7 +173,7 @@ public class GameController : MonoBehaviour {
 
         NotifyAllObservers(last);
 
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 32; i++) {
             Card next = deck[deck.Count - 1];
             next.isFaceUp = true;
             yield return MoveCard(next, discardObj, discard);
