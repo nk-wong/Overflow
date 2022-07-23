@@ -169,15 +169,11 @@ public class GameController : MonoBehaviour {
             playerObjs[i].GetComponent<Player>().PrintHand();
         }
         */
-        
-
-        NotifyAllObservers(last);
 
         for (int i = 0; i < 32; i++) {
             Card next = deck[deck.Count - 1];
             next.isFaceUp = true;
             yield return MoveCard(next, discardObj, discard);
-            NotifyAllObservers(next);
         }
         
     }
@@ -202,7 +198,28 @@ public class GameController : MonoBehaviour {
     }
 
     private IEnumerator MoveCard(Card card, GameObject newPos, List<Card> newDeck) {
-        yield return StartCoroutine(MoveCard(card, newPos, newDeck, 0));
+        yield return MoveCard(card, newPos, newDeck, 0);
+    }
+
+    //Moves a card to the deck and updates the game decks accordingly
+    private IEnumerator MoveToDeck(Card card, int offset) {
+        yield return MoveCard(card, deckObj, deck, offset);
+    }
+
+    //Moves a card to the discard and updates the game decks accordingly
+    private IEnumerator MoveToDiscard(Card card) {
+        yield return MoveCard(card, discardObj, discard);
+        NotifyAllObservers(card);
+    }
+
+    //Moves a card to the stash and updates the game decks accordingly
+    private IEnumerator MoveToStash(Card card) {
+        yield return MoveCard(card, stashObj, stash);
+    }
+
+    //Moves a card to the spill and updates the game decks accordingly
+    private IEnumerator MoveToSpill(Card card) {
+        yield return MoveCard(card, spillObj, spill);
     }
 
     //Finds the pile that the card is currently residing in
