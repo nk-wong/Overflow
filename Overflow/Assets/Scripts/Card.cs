@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class Card
 {
-    public string rank { get; private set; } //Holds the pip of the card
+    public string rank { get; private set; } //Holds the number of the card
     public string suit { get; private set; } //Holds the suit of the card
     public int value { get; private set; } //Holds the numerical value of the card
     public bool isFaceUp { get; set; } //Holds whether the card is face-up or face-down
+    public bool isRed { get; private set; } //Holds whether the color of the card is red
 
     public GameObject myObj; //Holds the visual object that the card data is attached to
 
@@ -17,6 +18,13 @@ public class Card
         this.suit = s;
         this.value = v;
         this.isFaceUp = false;
+
+        if (this.suit == "H" || this.suit == "D") {
+            this.isRed = true;
+        }
+        else {
+            this.isRed = false;
+        }
     }
 
     //Defines how two Cards are the same

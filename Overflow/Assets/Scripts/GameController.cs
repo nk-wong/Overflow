@@ -7,10 +7,12 @@ public class GameController : MonoBehaviour {
     public List<Card> deck { get; private set; } //Holds all the cards in the deck pile
     public List<Card> discard { get; private set; } //Holds all the cards in the discard pile
     public List<Card> spill { get; private set; } //Holds all the cards in the spill pile
-    public Card stash { get; private set; } //Holds the card in the stash pile
+    public List<Card> stash { get; private set; } //Holds the card in the stash pile
 
     public List<Card> hands { get; private set; } //Holds all the cards in held by the players
     public List<Card> sets { get; private set; } //Holds all the cards that have been set
+
+    public int stashVal { get; private set; } //Holds the value of the top discard card when a player stashed
 
     //Fields to help build the card game objects
     public GameObject cardPrefab; //Template to build cards
@@ -67,6 +69,7 @@ public class GameController : MonoBehaviour {
 
         //Generate the other decks
         discard = new List<Card>();
+        stash = new List<Card>();
         spill = new List<Card>();
         hands = new List<Card>();
         sets = new List<Card>();
@@ -106,53 +109,40 @@ public class GameController : MonoBehaviour {
         for (int i = 0; i < NUM_PLAYERS; i++) { //Give cards to players
             for (int j = 0; j < NUM_PLAYERS; j++) { //Give one card to each player
                 Card card = deck[deck.Count - 1]; //Take the top card
-                GameObject obj = playerObjs[j].transform.GetChild(i).gameObject; //Get the player 
-                if (j+1 == 1) { //If dealing to player 1, flip the card
-                    card.isFaceUp = true;
-                }
-                yield return StartCoroutine(MoveCard(card, obj, hands));
+                playerObjs[j].GetComponent<Player>().AddToHand(card); //Give the card to the player
+                GameObject obj = playerObjs[j].transform.GetChild(i).gameObject; //Get the player hand position
+                
+                yield return MoveCard(card, obj, hands);
             }
         }
         //Place a starting card in the discard pile
         Card last = deck[deck.Count - 1];
         last.isFaceUp = true; //Flip the card over
-        yield return StartCoroutine(MoveCard(last, discardObj, discard));
+        yield return MoveToDiscard(last);
 
         /*
-        Card lose1 = hands[0];
-        yield return StartCoroutine(Snatch(lose1));
+        for (int i = 0; i < NUM_PLAYERS; i++) {
+            playerObjs[i].GetComponent<Player>().PrintHand();
+        }
 
-        Card lose2 = hands[0];
-        yield return StartCoroutine(Snatch(lose2));
+        yield return playerObjs[0].GetComponent<Player>().Play();
+        yield return playerObjs[0].GetComponent<Player>().Play();
+        yield return playerObjs[0].GetComponent<Player>().Play();
+        yield return playerObjs[0].GetComponent<Player>().Play();
 
-        Card lose3 = hands[0];
-        yield return StartCoroutine(Snatch(lose3));
-
-        Card lose4 = hands[0];
-        yield return StartCoroutine(Snatch(lose4));
-        */
-
-        /*
-        Card lose1 = hands[0];
-        yield return StartCoroutine(Swap(lose1));
-
-        Card lose2 = hands[0];
-        yield return StartCoroutine(Swap(lose2));
-
-        Card lose3 = hands[0];
-        yield return StartCoroutine(Swap(lose3));
-
-        Card lose4 = hands[0];
-        yield return StartCoroutine(Swap(lose4));
+        for (int i = 0; i < NUM_PLAYERS; i++) {
+            playerObjs[i].GetComponent<Player>().PrintHand();
+        }
         */
         
-        /*
-        yield return StartCoroutine(Spill());
-        yield return StartCoroutine(Spill());
-        yield return StartCoroutine(Spill());
-        yield return StartCoroutine(Spill());
-        */
 
+        /*
+        for (int i = 0; i < 32; i++) {
+            Card next = deck[deck.Count - 1];
+            next.isFaceUp = true;
+            yield return MoveToDiscard(next);
+        }
+        */
         
     }
 
@@ -171,11 +161,33 @@ public class GameController : MonoBehaviour {
 
         AlignPile(deck, deckObj); //Make sure the deck is showing the correct top card
         AlignPile(discard, discardObj); //Make sure the discard is showing the correct top card
+        AlignPile(stash, stashObj); //Make sure the stash is the showing the correct top card
         AlignPile(spill, spillObj); //Make sure the spill is showing the correct top card
     }
 
     private IEnumerator MoveCard(Card card, GameObject newPos, List<Card> newDeck) {
-        yield return StartCoroutine(MoveCard(card, newPos, newDeck, 0));
+        yield return MoveCard(card, newPos, newDeck, 0);
+    }
+
+    //Moves a card to the deck and updates the game decks accordingly
+    private IEnumerator MoveToDeck(Card card, int offset) {
+        yield return MoveCard(card, deckObj, deck, offset);
+    }
+
+    //Moves a card to the discard and updates the game decks accordingly
+    private IEnumerator MoveToDiscard(Card card) {
+        yield return MoveCard(card, discardObj, discard);
+        NotifyAllObservers(card);
+    }
+
+    //Moves a card to the stash and updates the game decks accordingly
+    private IEnumerator MoveToStash(Card card) {
+        yield return MoveCard(card, stashObj, stash);
+    }
+
+    //Moves a card to the spill and updates the game decks accordingly
+    private IEnumerator MoveToSpill(Card card) {
+        yield return MoveCard(card, spillObj, spill);
     }
 
     //Finds the pile that the card is currently residing in
@@ -185,6 +197,9 @@ public class GameController : MonoBehaviour {
         }
         else if (discard.Contains(card)) {
             return discard;
+        }
+        else if (stash.Contains(card)) {
+            return stash;
         }
         else if (spill.Contains(card)) {
             return spill;
@@ -196,6 +211,7 @@ public class GameController : MonoBehaviour {
             return sets;
         }
         else {
+            Debug.Log("Could not find the card(" + card.rank + card.suit + ") in any pile");
             return null;
         }
     }
@@ -210,48 +226,85 @@ public class GameController : MonoBehaviour {
     }
 
     //Move a card from hand to discard, take a new card from the top of the deck
-    public IEnumerator Snatch(Card handCard) {
+    public IEnumerator Snatch(Card handCard, Player player) {
         //Save the position of the hand card
         GameObject temp = Instantiate(locationPrefab, new Vector3(handCard.myObj.transform.position.x, handCard.myObj.transform.position.y, handCard.myObj.transform.position.z), handCard.myObj.transform.rotation);
 
         //Move the hand card to the discard pile
         handCard.isFaceUp = true;
-        yield return StartCoroutine(MoveCard(handCard, discardObj, discard));
+        yield return MoveToDiscard(handCard);
 
         //Move the card on the top of the deck to the player's hand
         Card gain = deck[deck.Count - 1];
-        yield return StartCoroutine(MoveCard(gain, temp, hands));
+        player.GetComponent<Player>().AddToHand(gain);
+        yield return MoveCard(gain, temp, hands);
 
         //Remove the temp position
         Destroy(temp);
     }
 
     //Swap a card from hand with the third card from the top of the deck
-    public IEnumerator Swap(Card handCard) {
+    public IEnumerator Swap(Card handCard, Player player) {
         //Save the position of the hand card
         GameObject temp = Instantiate(locationPrefab, new Vector3(handCard.myObj.transform.position.x, handCard.myObj.transform.position.y, handCard.myObj.transform.position.z), handCard.myObj.transform.rotation);
 
         //Move the hand card to the third from top position in the deck
         handCard.isFaceUp = false;
-        yield return StartCoroutine(MoveCard(handCard, deckObj, deck, 3));
+        yield return MoveToDeck(handCard, 3);
 
         //Move the third from top card in the deck to the hand
         Card gain = deck[deck.Count - 3];
-        yield return StartCoroutine(MoveCard(gain, temp, hands));
+        player.GetComponent<Player>().AddToHand(gain);
+        yield return MoveCard(gain, temp, hands);
 
         //Remove the temp position
         Destroy(temp);
     }
 
+    public IEnumerator Stash(Card handCard, Player player) {
+        if (stash.Count == 0) { //No card in the stash
+            //Save the position of the hand card
+            GameObject temp = Instantiate(locationPrefab, new Vector3(handCard.myObj.transform.position.x, handCard.myObj.transform.position.y, handCard.myObj.transform.position.z), handCard.myObj.transform.rotation);
+
+            //Move the hand card to the stash pile
+            handCard.isFaceUp = false;
+            yield return MoveToStash(handCard);
+
+            //Set the stash value
+            stashVal = handCard.value;
+
+            //Move the card on the top of the deck to the player's hand
+            Card gain = deck[deck.Count - 1];
+            player.GetComponent<Player>().AddToHand(gain);
+            yield return MoveCard(gain, temp, hands);
+
+            //Remove the temp position
+            Destroy(temp);
+        }
+        else { //Steal the currently stashed card
+
+        }
+    }
+
     //Take three cards from the deck and place on spill, if any card in spill matches the top of the discard, spot drawing cards
-    public IEnumerator Spill() {
+    public IEnumerator Spill(Player player) {
         for (int i = 0; i < 3; i++) {
             Card card = deck[deck.Count - 1]; //Get card from top of deck
             card.isFaceUp = true; //Flip the card
-            yield return StartCoroutine(MoveCard(card, spillObj, spill)); //Move to spill pile
+            yield return MoveToSpill(card); //Move to spill pile
 
             if (card.suit == discard[discard.Count - 1].suit) { //Flipped card matches discard suit, end the spill
                 break;
+            }
+        }
+    }
+
+    //Notifies computer players that a card has been placed in the discard pile
+    private void NotifyAllObservers(Card card) {
+        for (int i = 0; i < playerObjs.Length; i++) {
+            Computer computer = playerObjs[i].GetComponent<Computer>();
+            if (!(computer is null)) {
+                computer.Notify(card);
             }
         }
     }
