@@ -140,9 +140,10 @@ public class GameController : MonoBehaviour {
         for (int i = 0; i < 32; i++) {
             Card next = deck[deck.Count - 1];
             next.isFaceUp = true;
-            yield return MoveCard(next, discardObj, discard);
+            yield return MoveToDiscard(next);
         }
         */
+        
     }
 
     //Moves a card from one position to another position and updates the game decks accordingly

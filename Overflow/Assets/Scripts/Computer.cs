@@ -24,8 +24,7 @@ public class Computer : Player
     }
 
     public void Notify(Card card) {
-        Debug.Log(this.name + " has noticed the card " + card.rank + card.suit + " has been placed in the discard");
         memory.Add(card, new List<Card>(hand));
-        memory.PrintCache();
+        memory.PrintCache(this.name + ": Noticed the (" + card.rank + card.suit + ") |");
     }
  }

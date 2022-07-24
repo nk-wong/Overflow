@@ -151,13 +151,12 @@ public class MemoryCache
     }
 
     //Debugging function used to print out the memory cache
-    public void PrintCache() {
-        Debug.Log("--------------------------------------");
+    public void PrintCache(string result) {
         for (int i = 0; i < cache.Length; i++) {
             if (!(cache[i] is null)) {
-                Debug.Log("Slot " + i + " holds the " + cache[i].rank + cache[i].suit);
+                result = result + cache[i].rank + cache[i].suit + "|";
             }
         }
-        Debug.Log("--------------------------------------");
+        Debug.Log(result);
     }
 }

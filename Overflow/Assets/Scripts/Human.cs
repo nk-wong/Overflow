@@ -2,22 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//Defines the different types of moves that a player can make
-public enum Move {
-    UNDEFINED,
-    SNATCH,
-    SWAP,
-    STASH,
-    SPILL
-};
+
 
 public class Human : Player
 {
      
     private bool move = false; //Detemines whether the player can choose a move
     private bool select = false; //Determines whether the player can select a card
-    private Move selectedMove = Move.UNDEFINED; //The move selected by the player
-    private Card selectedCard; //The card selected by the player
 
     // Update is called once per frame
     void Update() {
@@ -90,29 +81,6 @@ public class Human : Player
         }
         //Card has been selected, disable the player's ability to select another card
         select = false;
-    }
-
-    public IEnumerator MakeMove() {
-        switch (selectedMove) {
-            case Move.SNATCH:
-                RemoveFromHand(selectedCard);
-                yield return game.Snatch(selectedCard, this);
-                break;
-            case Move.SWAP:
-                RemoveFromHand(selectedCard);
-                yield return game.Swap(selectedCard, this);
-                break;
-            case Move.STASH:
-                RemoveFromHand(selectedCard);
-                yield return game.Stash(selectedCard, this);
-                break;
-            case Move.SPILL:
-                yield return game.Spill(this);
-                break;
-            default:
-                Debug.Log(this.name + " could not find a move to perform");
-                break;
-        }
     }
 
     //Enables move buttons based on the state of the game
