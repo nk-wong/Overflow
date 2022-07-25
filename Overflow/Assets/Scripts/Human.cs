@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-
 public class Human : Player
 {
      
@@ -94,14 +92,19 @@ public class Human : Player
         selectedCard = null;
     }
 
-    public override void AddToHand(Card card) {
-        if (Add(card, hand)) { //Check that adding the card is possible
+    public override GameObject AddToHand(Card card) {
+        //Find the index that the new card was added into
+        int result = Add(card, hand);
+        if (result >= 0) { //Check that adding the card was possible
             card.isFaceUp = true; //See the added card
             card.myObj.AddComponent<BoxCollider2D>(); //Enable interaction with the added card
         }
         else { //No free space to add the card, output error
             Debug.Log(this.name + " does not have space in its hand to add the card(" + card.rank + card.suit + ")");
         }
+
+        //Use the index to find the GameObject
+        return this.transform.Find("Hand" + (result + 1)).gameObject;
     }
 
     public override void RemoveFromHand(Card card) {
@@ -142,8 +145,5 @@ public class Human : Player
                 return false;
         }
     }
-
-
-
 
 }

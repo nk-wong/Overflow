@@ -124,7 +124,7 @@ public class GameController : MonoBehaviour {
         for (int i = 0; i < NUM_PLAYERS; i++) {
             playerObjs[i].GetComponent<Player>().PrintHand();
         }
-
+        
         yield return playerObjs[0].GetComponent<Player>().Play();
         yield return playerObjs[0].GetComponent<Player>().Play();
         yield return playerObjs[0].GetComponent<Player>().Play();

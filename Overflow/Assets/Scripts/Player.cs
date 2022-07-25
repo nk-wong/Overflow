@@ -23,7 +23,7 @@ public abstract class Player : MonoBehaviour
     protected Card selectedCard; //The card selected by the player
 
     public abstract IEnumerator Play(); //Runs through the player's turn
-    public abstract void AddToHand(Card card); //Adds the inputted card to the player's hand
+    public abstract GameObject AddToHand(Card card); //Adds the inputted card to the player's hand
     public abstract void RemoveFromHand(Card card); //Removes the inputted card from the player's hand
 
     // Start is called before the first frame update
@@ -39,16 +39,16 @@ public abstract class Player : MonoBehaviour
         
     }
 
-    //Adds an inputted card to an empty spot in a Card array
-    protected bool Add(Card card, Card[] type) {
+    //Adds an inputted card to an empty spot in a Card array and returns the index of the spot
+    protected int Add(Card card, Card[] type) {
         for (int i = 0; i < type.Length; i++) {
             if (type[i] is null) { //Empty spot found
                 type[i] = card;
-                return true;
+                return i;
             }
         }
 
-        return false;
+        return -1;
     }
 
     //Removes a specified card from the Card array
@@ -63,6 +63,7 @@ public abstract class Player : MonoBehaviour
         return false;
     }
 
+    //Performs the selected move for the player and removes any necessary cards
     public IEnumerator MakeMove() {
         switch (selectedMove) {
             case Move.SNATCH:
