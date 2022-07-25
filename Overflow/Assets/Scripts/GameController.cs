@@ -109,10 +109,9 @@ public class GameController : MonoBehaviour {
         for (int i = 0; i < NUM_PLAYERS; i++) { //Give cards to players
             for (int j = 0; j < NUM_PLAYERS; j++) { //Give one card to each player
                 Card card = deck[deck.Count - 1]; //Take the top card
-                playerObjs[j].GetComponent<Player>().AddToHand(card); //Give the card to the player
-                GameObject obj = playerObjs[j].transform.GetChild(i).gameObject; //Get the player hand position
+                GameObject obj = playerObjs[j].GetComponent<Player>().AddToHand(card); //Give the card to the player
                 
-                yield return MoveCard(card, obj, hands);
+                yield return MoveToHands(card, obj);
             }
         }
         //Place a starting card in the discard pile
@@ -188,6 +187,11 @@ public class GameController : MonoBehaviour {
     //Moves a card to the spill and updates the game decks accordingly
     private IEnumerator MoveToSpill(Card card) {
         yield return MoveCard(card, spillObj, spill);
+    }
+
+    //Moves a card to the hands and updates the game decks accordingly
+    private IEnumerator MoveToHands(Card card, GameObject playerHand) {
+        yield return MoveCard(card, playerHand, hands);
     }
 
     //Finds the pile that the card is currently residing in
