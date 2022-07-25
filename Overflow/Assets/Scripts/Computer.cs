@@ -11,10 +11,15 @@ public class Computer : Player
         yield return null;
     }
 
-    public override void AddToHand(Card card) {
-        if (!Add(card, hand)) { //No free space to add the card, output error
+    public override GameObject AddToHand(Card card) {
+        //Find the index that the new card was added into
+        int result = Add(card, hand);
+        if (result < 0) { //No free space to add the card, output error
             Debug.Log(this.name + " does not have space in its hand to add the card(" + card.rank + card.suit + ")");
         }
+
+        //Use the index to find the GameObject
+        return this.transform.Find("Hand" + (result + 1)).gameObject;
     }
 
     public override void RemoveFromHand(Card card) {

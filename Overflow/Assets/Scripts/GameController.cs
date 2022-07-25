@@ -16,7 +16,6 @@ public class GameController : MonoBehaviour {
 
     //Fields to help build the card game objects
     public GameObject cardPrefab; //Template to build cards
-    public GameObject locationPrefab; //Template to build temporary locations
     public Sprite[] cardFaces; //Holds the image for each card in the deck
 
     //Fields to help position cards
@@ -109,10 +108,9 @@ public class GameController : MonoBehaviour {
         for (int i = 0; i < NUM_PLAYERS; i++) { //Give cards to players
             for (int j = 0; j < NUM_PLAYERS; j++) { //Give one card to each player
                 Card card = deck[deck.Count - 1]; //Take the top card
-                playerObjs[j].GetComponent<Player>().AddToHand(card); //Give the card to the player
-                GameObject obj = playerObjs[j].transform.GetChild(i).gameObject; //Get the player hand position
+                GameObject obj = playerObjs[j].GetComponent<Player>().AddToHand(card); //Give the card to the player
                 
-                yield return MoveCard(card, obj, hands);
+                yield return MoveToHands(card, obj);
             }
         }
         //Place a starting card in the discard pile
@@ -120,21 +118,19 @@ public class GameController : MonoBehaviour {
         last.isFaceUp = true; //Flip the card over
         yield return MoveToDiscard(last);
 
-        /*
-        for (int i = 0; i < NUM_PLAYERS; i++) {
-            playerObjs[i].GetComponent<Player>().PrintHand();
-        }
-
-        yield return playerObjs[0].GetComponent<Player>().Play();
-        yield return playerObjs[0].GetComponent<Player>().Play();
-        yield return playerObjs[0].GetComponent<Player>().Play();
-        yield return playerObjs[0].GetComponent<Player>().Play();
-
-        for (int i = 0; i < NUM_PLAYERS; i++) {
-            playerObjs[i].GetComponent<Player>().PrintHand();
-        }
-        */
         
+        for (int i = 0; i < NUM_PLAYERS; i++) {
+            playerObjs[i].GetComponent<Player>().PrintHand();
+        }
+        
+        yield return playerObjs[0].GetComponent<Player>().Play();
+        yield return playerObjs[0].GetComponent<Player>().Play();
+        yield return playerObjs[0].GetComponent<Player>().Play();
+        yield return playerObjs[0].GetComponent<Player>().Play();
+
+        for (int i = 0; i < NUM_PLAYERS; i++) {
+            playerObjs[i].GetComponent<Player>().PrintHand();
+        }
 
         /*
         for (int i = 0; i < 32; i++) {
@@ -143,7 +139,6 @@ public class GameController : MonoBehaviour {
             yield return MoveToDiscard(next);
         }
         */
-        
     }
 
     //Moves a card from one position to another position and updates the game decks accordingly
@@ -190,6 +185,11 @@ public class GameController : MonoBehaviour {
         yield return MoveCard(card, spillObj, spill);
     }
 
+    //Moves a card to the hands and updates the game decks accordingly
+    private IEnumerator MoveToHands(Card card, GameObject playerHand) {
+        yield return MoveCard(card, playerHand, hands);
+    }
+
     //Finds the pile that the card is currently residing in
     private List<Card> FindPile(Card card) {
         if (deck.Contains(card)) {
@@ -227,45 +227,31 @@ public class GameController : MonoBehaviour {
 
     //Move a card from hand to discard, take a new card from the top of the deck
     public IEnumerator Snatch(Card handCard, Player player) {
-        //Save the position of the hand card
-        GameObject temp = Instantiate(locationPrefab, new Vector3(handCard.myObj.transform.position.x, handCard.myObj.transform.position.y, handCard.myObj.transform.position.z), handCard.myObj.transform.rotation);
-
         //Move the hand card to the discard pile
         handCard.isFaceUp = true;
         yield return MoveToDiscard(handCard);
 
         //Move the card on the top of the deck to the player's hand
         Card gain = deck[deck.Count - 1];
-        player.GetComponent<Player>().AddToHand(gain);
-        yield return MoveCard(gain, temp, hands);
-
-        //Remove the temp position
-        Destroy(temp);
+        GameObject obj = player.GetComponent<Player>().AddToHand(gain);
+        yield return MoveToHands(gain, obj);
     }
 
     //Swap a card from hand with the third card from the top of the deck
     public IEnumerator Swap(Card handCard, Player player) {
-        //Save the position of the hand card
-        GameObject temp = Instantiate(locationPrefab, new Vector3(handCard.myObj.transform.position.x, handCard.myObj.transform.position.y, handCard.myObj.transform.position.z), handCard.myObj.transform.rotation);
-
         //Move the hand card to the third from top position in the deck
         handCard.isFaceUp = false;
         yield return MoveToDeck(handCard, 3);
 
         //Move the third from top card in the deck to the hand
         Card gain = deck[deck.Count - 3];
-        player.GetComponent<Player>().AddToHand(gain);
-        yield return MoveCard(gain, temp, hands);
-
-        //Remove the temp position
-        Destroy(temp);
+        GameObject obj = player.GetComponent<Player>().AddToHand(gain);
+        yield return MoveToHands(gain, obj);
     }
 
+    //Move a card face down onto the stash pile, or steal a card if the stash is occupied
     public IEnumerator Stash(Card handCard, Player player) {
         if (stash.Count == 0) { //No card in the stash
-            //Save the position of the hand card
-            GameObject temp = Instantiate(locationPrefab, new Vector3(handCard.myObj.transform.position.x, handCard.myObj.transform.position.y, handCard.myObj.transform.position.z), handCard.myObj.transform.rotation);
-
             //Move the hand card to the stash pile
             handCard.isFaceUp = false;
             yield return MoveToStash(handCard);
@@ -275,11 +261,8 @@ public class GameController : MonoBehaviour {
 
             //Move the card on the top of the deck to the player's hand
             Card gain = deck[deck.Count - 1];
-            player.GetComponent<Player>().AddToHand(gain);
-            yield return MoveCard(gain, temp, hands);
-
-            //Remove the temp position
-            Destroy(temp);
+            GameObject obj = player.GetComponent<Player>().AddToHand(gain);
+            yield return MoveToHands(gain, obj);
         }
         else { //Steal the currently stashed card
 
