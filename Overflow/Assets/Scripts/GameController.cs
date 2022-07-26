@@ -118,7 +118,7 @@ public class GameController : MonoBehaviour {
         last.isFaceUp = true; //Flip the card over
         yield return MoveToDiscard(last);
 
-        
+        /*
         for (int i = 0; i < NUM_PLAYERS; i++) {
             playerObjs[i].GetComponent<Player>().PrintHand();
         }
@@ -131,6 +131,7 @@ public class GameController : MonoBehaviour {
         for (int i = 0; i < NUM_PLAYERS; i++) {
             playerObjs[i].GetComponent<Player>().PrintHand();
         }
+        */
 
         /*
         for (int i = 0; i < 32; i++) {
@@ -139,6 +140,21 @@ public class GameController : MonoBehaviour {
             yield return MoveToDiscard(next);
         }
         */
+
+        /*
+        for (int i = 0; i < 20; i++) {
+            Card deckTop = deck[deck.Count - 1];
+            deckTop.isFaceUp = true;
+            GameObject obj = playerObjs[i%4].GetComponent<Player>().AddToSet(deckTop);
+
+            yield return MoveToSets(deckTop, obj);
+        }
+
+        for (int i = 0; i < 4; i++) {
+            playerObjs[i].GetComponent<Player>().PrintSet();
+        }
+        */
+
     }
 
     //Moves a card from one position to another position and updates the game decks accordingly
@@ -188,6 +204,11 @@ public class GameController : MonoBehaviour {
     //Moves a card to the hands and updates the game decks accordingly
     private IEnumerator MoveToHands(Card card, GameObject playerHand) {
         yield return MoveCard(card, playerHand, hands);
+    }
+
+    //Moves a card to the sets and updates the game decks accordingly
+    private IEnumerator MoveToSets(Card card, GameObject playerSet) {
+        yield return MoveCard(card, playerSet, sets);
     }
 
     //Finds the pile that the card is currently residing in
