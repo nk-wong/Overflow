@@ -105,15 +105,12 @@ public abstract class Player : MonoBehaviour
     public IEnumerator MakeMove() {
         switch (selectedMove) {
             case Move.SNATCH:
-                RemoveFromHand(selectedCard);
                 yield return game.Snatch(selectedCard, this);
                 break;
             case Move.SWAP:
-                RemoveFromHand(selectedCard);
                 yield return game.Swap(selectedCard, this);
                 break;
             case Move.STASH:
-                RemoveFromHand(selectedCard);
                 yield return game.Stash(selectedCard, this);
                 break;
             case Move.SPILL:

@@ -12,7 +12,8 @@ public class GameController : MonoBehaviour {
     public List<Card> hands { get; private set; } //Holds all the cards in held by the players
     public List<Card> sets { get; private set; } //Holds all the cards that have been set
 
-    public int stashVal { get; private set; } //Holds the value of the top discard card when a player stashed
+    public int stashValue { get; private set; } //Holds the value of the top discard card when a player stashed
+    public Player stashPlayer { get; private set; } //Holds the player who stashed the card which currently occupies the stash
 
     //Fields to help build the card game objects
     public GameObject cardPrefab; //Template to build cards
@@ -250,6 +251,7 @@ public class GameController : MonoBehaviour {
     public IEnumerator Snatch(Card handCard, Player player) {
         //Move the hand card to the discard pile
         handCard.isFaceUp = true;
+        player.RemoveFromHand(handCard);
         yield return MoveToDiscard(handCard);
 
         //Move the card on the top of the deck to the player's hand
@@ -262,6 +264,7 @@ public class GameController : MonoBehaviour {
     public IEnumerator Swap(Card handCard, Player player) {
         //Move the hand card to the third from top position in the deck
         handCard.isFaceUp = false;
+        player.RemoveFromHand(handCard);
         yield return MoveToDeck(handCard, 3);
 
         //Move the third from top card in the deck to the hand
@@ -275,10 +278,12 @@ public class GameController : MonoBehaviour {
         if (stash.Count == 0) { //No card in the stash
             //Move the hand card to the stash pile
             handCard.isFaceUp = false;
+            player.RemoveFromHand(handCard);
             yield return MoveToStash(handCard);
 
             //Set the stash value
-            stashVal = handCard.value;
+            stashValue = discard[discard.Count - 1].value;
+            stashPlayer = player;
 
             //Move the card on the top of the deck to the player's hand
             Card gain = deck[deck.Count - 1];
@@ -286,7 +291,17 @@ public class GameController : MonoBehaviour {
             yield return MoveToHands(gain, obj);
         }
         else { //Steal the currently stashed card
+            //Show the stashed card to players
+            Card stashedCard = stash[stash.Count - 1];
+            stashedCard.isFaceUp = true;
+            yield return new WaitForSeconds(1.5f);
 
+            //Determine if stashed card will be a sticky card
+            stashedCard.isFaceUp = stashedCard.value > stashValue ? true : false;
+
+            //Move the stashed card from the stash pile to the player's set
+            GameObject obj = player.AddToSet(stashedCard);
+            yield return MoveToSets(stashedCard, obj);
         }
     }
 
