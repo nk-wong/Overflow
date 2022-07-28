@@ -256,7 +256,7 @@ public class GameController : MonoBehaviour {
 
         //Move the card on the top of the deck to the player's hand
         Card gain = deck[deck.Count - 1];
-        GameObject obj = player.GetComponent<Player>().AddToHand(gain);
+        GameObject obj = player.AddToHand(gain);
         yield return MoveToHands(gain, obj);
     }
 
@@ -269,7 +269,7 @@ public class GameController : MonoBehaviour {
 
         //Move the third from top card in the deck to the hand
         Card gain = deck[deck.Count - 3];
-        GameObject obj = player.GetComponent<Player>().AddToHand(gain);
+        GameObject obj = player.AddToHand(gain);
         yield return MoveToHands(gain, obj);
     }
 
@@ -287,7 +287,7 @@ public class GameController : MonoBehaviour {
 
             //Move the card on the top of the deck to the player's hand
             Card gain = deck[deck.Count - 1];
-            GameObject obj = player.GetComponent<Player>().AddToHand(gain);
+            GameObject obj = player.AddToHand(gain);
             yield return MoveToHands(gain, obj);
         }
         else { //Steal the currently stashed card
@@ -306,15 +306,26 @@ public class GameController : MonoBehaviour {
     }
 
     //Take three cards from the deck and place on spill, if any card in spill matches the top of the discard, spot drawing cards
-    public IEnumerator Spill(Player player) {
+    public IEnumerator Spill(Card handCard, Player player) {
         for (int i = 0; i < 3; i++) {
             Card card = deck[deck.Count - 1]; //Get card from top of deck
             card.isFaceUp = true; //Flip the card
             yield return MoveToSpill(card); //Move to spill pile
+            yield return new WaitForSeconds(0.75f); //Allow players to see card before next flip
 
             if (card.suit == discard[discard.Count - 1].suit) { //Flipped card matches discard suit, end the spill
                 break;
             }
+        }
+        if (discard[discard.Count - 1].suit != spill[spill.Count - 1].suit) { //If the spill was successful, player can set a card
+            GameObject obj1 = player.AddToSet(handCard);
+            player.RemoveFromHand(handCard);
+            yield return MoveToSets(handCard, obj1);
+
+            //Move the card on the top of the deck to the player's hand
+            Card gain = deck[deck.Count - 1];
+            GameObject obj2 = player.AddToHand(gain);
+            yield return MoveToHands(gain, obj2);
         }
     }
 

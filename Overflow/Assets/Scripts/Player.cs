@@ -114,7 +114,7 @@ public abstract class Player : MonoBehaviour
                 yield return game.Stash(selectedCard, this);
                 break;
             case Move.SPILL:
-                yield return game.Spill(this);
+                yield return game.Spill(selectedCard, this);
                 break;
             default:
                 Debug.Log(this.name + " could not find a move to perform");
