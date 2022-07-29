@@ -12,7 +12,8 @@ public class GameController : MonoBehaviour {
     public List<Card> hands { get; private set; } //Holds all the cards in held by the players
     public List<Card> sets { get; private set; } //Holds all the cards that have been set
 
-    public int stashVal { get; private set; } //Holds the value of the top discard card when a player stashed
+    public int stashValue { get; private set; } //Holds the value of the top discard card when a player stashed
+    public Player stashPlayer { get; private set; } //Holds the player who stashed the card which currently occupies the stash
 
     //Fields to help build the card game objects
     public GameObject cardPrefab; //Template to build cards
@@ -118,7 +119,7 @@ public class GameController : MonoBehaviour {
         last.isFaceUp = true; //Flip the card over
         yield return MoveToDiscard(last);
 
-        
+        /*
         for (int i = 0; i < NUM_PLAYERS; i++) {
             playerObjs[i].GetComponent<Player>().PrintHand();
         }
@@ -131,6 +132,7 @@ public class GameController : MonoBehaviour {
         for (int i = 0; i < NUM_PLAYERS; i++) {
             playerObjs[i].GetComponent<Player>().PrintHand();
         }
+        */
 
         /*
         for (int i = 0; i < 32; i++) {
@@ -139,6 +141,43 @@ public class GameController : MonoBehaviour {
             yield return MoveToDiscard(next);
         }
         */
+
+        /*
+        for (int i = 0; i < 20; i++) {
+            Card deckTop = deck[deck.Count - 1];
+            deckTop.isFaceUp = true;
+            GameObject obj = playerObjs[i%4].GetComponent<Player>().AddToSet(deckTop);
+
+            yield return MoveToSets(deckTop, obj);
+        }
+
+        for (int i = 0; i < 4; i++) {
+            playerObjs[i].GetComponent<Player>().PrintSet();
+        }
+        */
+        StartCoroutine(PlayGame());
+    }
+
+    //Starts the game loop
+    private IEnumerator PlayGame() {
+        while (true) {
+            yield return playerObjs[0].GetComponent<Player>().Play();
+
+            yield return StickyRule(playerObjs[0].GetComponent<Player>());
+        }
+    }
+
+    //Removes all non-sticky cards from a player's set if the final card added to the set was a sticky
+    private IEnumerator StickyRule(Player player) {
+        if (player.SetIsFull() && player.score == 0) {
+            for (int i = 0; i < player.set.Length; i++) {
+                if (player.set[i].isFaceUp) { //Remove face up set cards
+                    //Move non-sticky set cards to the discard
+                    yield return MoveToDiscard(player.set[i]);
+                    player.RemoveFromSet(player.set[i]);
+                }
+            }
+        }
     }
 
     //Moves a card from one position to another position and updates the game decks accordingly
@@ -190,6 +229,11 @@ public class GameController : MonoBehaviour {
         yield return MoveCard(card, playerHand, hands);
     }
 
+    //Moves a card to the sets and updates the game decks accordingly
+    private IEnumerator MoveToSets(Card card, GameObject playerSet) {
+        yield return MoveCard(card, playerSet, sets);
+    }
+
     //Finds the pile that the card is currently residing in
     private List<Card> FindPile(Card card) {
         if (deck.Contains(card)) {
@@ -229,11 +273,12 @@ public class GameController : MonoBehaviour {
     public IEnumerator Snatch(Card handCard, Player player) {
         //Move the hand card to the discard pile
         handCard.isFaceUp = true;
+        player.RemoveFromHand(handCard);
         yield return MoveToDiscard(handCard);
 
         //Move the card on the top of the deck to the player's hand
         Card gain = deck[deck.Count - 1];
-        GameObject obj = player.GetComponent<Player>().AddToHand(gain);
+        GameObject obj = player.AddToHand(gain);
         yield return MoveToHands(gain, obj);
     }
 
@@ -241,11 +286,12 @@ public class GameController : MonoBehaviour {
     public IEnumerator Swap(Card handCard, Player player) {
         //Move the hand card to the third from top position in the deck
         handCard.isFaceUp = false;
+        player.RemoveFromHand(handCard);
         yield return MoveToDeck(handCard, 3);
 
         //Move the third from top card in the deck to the hand
         Card gain = deck[deck.Count - 3];
-        GameObject obj = player.GetComponent<Player>().AddToHand(gain);
+        GameObject obj = player.AddToHand(gain);
         yield return MoveToHands(gain, obj);
     }
 
@@ -254,31 +300,54 @@ public class GameController : MonoBehaviour {
         if (stash.Count == 0) { //No card in the stash
             //Move the hand card to the stash pile
             handCard.isFaceUp = false;
+            player.RemoveFromHand(handCard);
             yield return MoveToStash(handCard);
 
             //Set the stash value
-            stashVal = handCard.value;
+            stashValue = discard[discard.Count - 1].value;
+            stashPlayer = player;
 
             //Move the card on the top of the deck to the player's hand
             Card gain = deck[deck.Count - 1];
-            GameObject obj = player.GetComponent<Player>().AddToHand(gain);
+            GameObject obj = player.AddToHand(gain);
             yield return MoveToHands(gain, obj);
         }
         else { //Steal the currently stashed card
+            //Show the stashed card to players
+            Card stashedCard = stash[stash.Count - 1];
+            stashedCard.isFaceUp = true;
+            yield return new WaitForSeconds(1.5f);
 
+            //Determine if stashed card will be a sticky card
+            stashedCard.isFaceUp = stashedCard.value > stashValue ? true : false;
+
+            //Move the stashed card from the stash pile to the player's set
+            GameObject obj = player.AddToSet(stashedCard);
+            yield return MoveToSets(stashedCard, obj);
         }
     }
 
     //Take three cards from the deck and place on spill, if any card in spill matches the top of the discard, spot drawing cards
-    public IEnumerator Spill(Player player) {
+    public IEnumerator Spill(Card handCard, Player player) {
         for (int i = 0; i < 3; i++) {
             Card card = deck[deck.Count - 1]; //Get card from top of deck
             card.isFaceUp = true; //Flip the card
             yield return MoveToSpill(card); //Move to spill pile
+            yield return new WaitForSeconds(0.75f); //Allow players to see card before next flip
 
             if (card.suit == discard[discard.Count - 1].suit) { //Flipped card matches discard suit, end the spill
                 break;
             }
+        }
+        if (discard[discard.Count - 1].suit != spill[spill.Count - 1].suit) { //If the spill was successful, player can set a card
+            GameObject obj1 = player.AddToSet(handCard);
+            player.RemoveFromHand(handCard);
+            yield return MoveToSets(handCard, obj1);
+
+            //Move the card on the top of the deck to the player's hand
+            Card gain = deck[deck.Count - 1];
+            GameObject obj2 = player.AddToHand(gain);
+            yield return MoveToHands(gain, obj2);
         }
     }
 

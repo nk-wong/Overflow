@@ -16,15 +16,15 @@ public abstract class Player : MonoBehaviour
 
     protected GameController game; //Observes the game
 
-    protected Card[] hand = new Card[4]; //The player's hand cards
-    protected Card[] set = new Card[5]; //The player's point cards
+    public Card[] hand = new Card[4]; //The player's hand cards
+    public Card[] set = new Card[5]; //The player's point cards
+
+    public int score { get; private set; } //The player's score
 
     protected Move selectedMove = Move.UNDEFINED; //The move selected by the player
     protected Card selectedCard; //The card selected by the player
 
     public abstract IEnumerator Play(); //Runs through the player's turn
-    public abstract GameObject AddToHand(Card card); //Adds the inputted card to the player's hand
-    public abstract void RemoveFromHand(Card card); //Removes the inputted card from the player's hand
 
     // Start is called before the first frame update
     void Start()
@@ -63,23 +63,83 @@ public abstract class Player : MonoBehaviour
         return false;
     }
 
+    //Adds the inputted card to the player's hand
+    public virtual GameObject AddToHand(Card card) {
+        //Find the index that the new card was added into
+        int result = Add(card, hand);
+        if (result < 0) { //No free space to add the card, output error
+            Debug.Log(this.name + " does not have space in its hand to add the card(" + card.rank + card.suit + ")");
+        }
+
+        //Use the index to find the GameObject
+        return this.transform.Find("Hand" + (result + 1)).gameObject;
+    }
+
+    //Removes the inputted card from the player's hand
+    public virtual void RemoveFromHand(Card card) {
+        if (!Remove(card, hand)) { //Could not find the card, output error
+            Debug.Log(this.name + " cannot remove the card(" + card.rank + card.suit + ") because it does not exist in the hand");
+        }
+    }
+
+    //Adds the inputted card to the player's set
+    public GameObject AddToSet(Card card) {
+        //Find the index that the new card was added into
+        int result = Add(card, set);
+        if (result < 0) { //No free space to add the card, output error
+            Debug.Log(this.name + " does not have space in its set to add the card(" + card.rank + card.suit + ")");
+        }
+
+        //If the final card added to a set is sticky, player loses all their points
+        score = (card.isFaceUp == false && SetIsFull()) ? 0 : CalculateScore();
+        Debug.Log(this.name + " score is " + score);
+
+        //Use the index to find the GameObject
+        return this.transform.Find("Set" + (result + 1)).gameObject;
+    }
+
+    //Removes the inputted card from the player's set
+    public void RemoveFromSet(Card card) {
+        if (!Remove(card, set)) { //Could not find the card, output error
+            Debug.Log(this.name + " cannot remove the card(" + card.rank + card.suit + ") because it does not exist in the set");
+        }
+    }
+
+    //Returns true if the set is fully occupied by cards
+    public bool SetIsFull() {
+        for (int i = 0; i < set.Length; i++) {
+            if (set[i] is null) { //Found an empty spot
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //Determines the player's score based on the value of the cards that have been set
+    protected int CalculateScore() {
+        int sum = 0;
+        for (int i = 0; i < set.Length; i++) {
+            if (!(set[i] is null) && set[i].isFaceUp) {
+                sum += set[i].value;
+            }
+        }
+        return sum;
+    }
+
     //Performs the selected move for the player and removes any necessary cards
     public IEnumerator MakeMove() {
         switch (selectedMove) {
             case Move.SNATCH:
-                RemoveFromHand(selectedCard);
                 yield return game.Snatch(selectedCard, this);
                 break;
             case Move.SWAP:
-                RemoveFromHand(selectedCard);
                 yield return game.Swap(selectedCard, this);
                 break;
             case Move.STASH:
-                RemoveFromHand(selectedCard);
                 yield return game.Stash(selectedCard, this);
                 break;
             case Move.SPILL:
-                yield return game.Spill(this);
+                yield return game.Spill(selectedCard, this);
                 break;
             default:
                 Debug.Log(this.name + " could not find a move to perform");
@@ -90,7 +150,18 @@ public abstract class Player : MonoBehaviour
     //Debugging function to identify which cards are in a player's hand
     public void PrintHand() {
         for (int i = 0; i < hand.Length; i++) {
-            Debug.Log(this.name + " has card(" + hand[i].rank + hand[i].suit + ")");
+            if (!(hand[i] is null)) {
+                Debug.Log(this.name + " has card(" + hand[i].rank + hand[i].suit + ")");
+            }
+        }
+    }
+
+    //Debugging function to identify which cards are in a player's hand
+    public void PrintSet() {
+        for (int i = 0; i < set.Length; i++) {
+            if (!(set[i] is null)) {
+                Debug.Log(this.name + " has card(" + set[i].rank + set[i].suit + ")");
+            }
         }
     }
 }
