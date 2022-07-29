@@ -155,7 +155,29 @@ public class GameController : MonoBehaviour {
             playerObjs[i].GetComponent<Player>().PrintSet();
         }
         */
+        StartCoroutine(PlayGame());
+    }
 
+    //Starts the game loop
+    private IEnumerator PlayGame() {
+        while (true) {
+            yield return playerObjs[0].GetComponent<Player>().Play();
+
+            yield return StickyRule(playerObjs[0].GetComponent<Player>());
+        }
+    }
+
+    //Removes all non-sticky cards from a player's set if the final card added to the set was a sticky
+    private IEnumerator StickyRule(Player player) {
+        if (player.SetIsFull() && player.score == 0) {
+            for (int i = 0; i < player.set.Length; i++) {
+                if (player.set[i].isFaceUp) { //Remove face up set cards
+                    //Move non-sticky set cards to the discard
+                    yield return MoveToDiscard(player.set[i]);
+                    player.RemoveFromSet(player.set[i]);
+                }
+            }
+        }
     }
 
     //Moves a card from one position to another position and updates the game decks accordingly
