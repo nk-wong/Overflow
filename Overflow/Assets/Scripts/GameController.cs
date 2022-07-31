@@ -123,24 +123,25 @@ public class GameController : MonoBehaviour {
         for (int i = 0; i < NUM_PLAYERS; i++) {
             playerObjs[i].GetComponent<Player>().PrintHand();
         }
-        
-        yield return playerObjs[0].GetComponent<Player>().Play();
-        yield return playerObjs[0].GetComponent<Player>().Play();
-        yield return playerObjs[0].GetComponent<Player>().Play();
-        yield return playerObjs[0].GetComponent<Player>().Play();
 
+        yield return playerObjs[0].GetComponent<Player>().Play();
+        yield return playerObjs[0].GetComponent<Player>().Play();
+        yield return playerObjs[0].GetComponent<Player>().Play();
+        yield return playerObjs[0].GetComponent<Player>().Play();
+        
         for (int i = 0; i < NUM_PLAYERS; i++) {
             playerObjs[i].GetComponent<Player>().PrintHand();
         }
         */
 
         /*
-        for (int i = 0; i < 32; i++) {
+        for (int i = 0; i < 20; i++) {
             Card next = deck[deck.Count - 1];
             next.isFaceUp = true;
             yield return MoveToDiscard(next);
         }
         */
+        
 
         /*
         for (int i = 0; i < 20; i++) {
@@ -155,7 +156,8 @@ public class GameController : MonoBehaviour {
             playerObjs[i].GetComponent<Player>().PrintSet();
         }
         */
-        StartCoroutine(PlayGame());
+        
+        //StartCoroutine(PlayGame());
     }
 
     //Starts the game loop

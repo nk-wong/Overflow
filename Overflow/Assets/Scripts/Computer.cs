@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Computer : Player
 {
-    private MemoryCache memory = new MemoryCache(15); //The cards in the discard pile that the computer remembers
+    private MemoryCache memory = new MemoryCache(11); //The cards in the discard pile that the computer remembers
 
     //TODO
     public override IEnumerator Play() {
@@ -12,7 +12,7 @@ public class Computer : Player
     }
 
     public void Notify(Card card) {
-        memory.Add(card, new List<Card>(hand));
+        memory.Add(card, game.sets, hand);
         memory.PrintCache(this.name + ": Noticed the (" + card.rank + card.suit + ") |");
     }
  }

@@ -20,7 +20,7 @@ public class MemoryCache
         }
     }
 
-    public bool Add(Card card, List<Card> gameState) {
+    public bool Add(Card card, List<Card> gameState, Card[] hand) {
         if (!IsFull()) { //Cache still has space, add in empty spot
             for (int i = 0; i < cache.Length; i++) {
                 if (cache[i] is null) { //Open spot found
@@ -33,11 +33,11 @@ public class MemoryCache
             return false;
         }
         else {
-            string dominantSuit = FindDominantSuit(gameState);
-            int lowestIndex = FindLowestIndex(dominantSuit, gameState);
+            string dominantSuit = FindDominantSuit(gameState, hand);
+            int lowestIndex = FindLowestIndex(dominantSuit, gameState, hand);
 
-            int newCardWeight = card.suit == dominantSuit ? MAX_CACHE_SIZE : (CountSuit(card.suit, gameState) - card.value);
-            int oldCardWeight = cache[lowestIndex].suit == dominantSuit ? MAX_CACHE_SIZE : (CountSuit(cache[lowestIndex].suit, gameState) - cache[lowestIndex].value);
+            int newCardWeight = card.suit == dominantSuit ? MAX_CACHE_SIZE : (CountSuit(card.suit, gameState, hand) - card.value);
+            int oldCardWeight = cache[lowestIndex].suit == dominantSuit ? MAX_CACHE_SIZE : (CountSuit(cache[lowestIndex].suit, gameState, hand) - cache[lowestIndex].value);
             if (newCardWeight > oldCardWeight) {
                 cache[lowestIndex] = card;
                 return true;
@@ -64,10 +64,10 @@ public class MemoryCache
     }
 
     //Counts the number of cards in the cache and game that match the inputted suit
-    public int CountSuit(string suit, List<Card> gameState) {
+    public int CountSuit(string suit, List<Card> gameState, Card[] hand) {
         int count = 0;
         for (int i = 0; i < gameState.Count; i++) {
-            if (gameState[i].suit == suit) { //Found a card in the game that matches in suit, increment count
+            if (gameState[i].isFaceUp && gameState[i].suit == suit) { //Found a card in the game that matches in suit, increment count
                 count++;
             }
         }
@@ -76,11 +76,16 @@ public class MemoryCache
                 count++;
             }
         }
+        for (int i = 0; i < hand.Length; i++) {
+            if (!(hand[i] is null) && hand[i].suit == suit) { //Found a card in the hand that matches in suit, increment count
+                count++;
+            }
+        }
         return count;
     }
 
     //Determine which suit is the most identified in the game
-    private string FindDominantSuit(List<Card> gameState) {
+    private string FindDominantSuit(List<Card> gameState, Card[] hand) {
         int spadeCount = 0;
         int heartCount = 0;
         int clubCount = 0;
@@ -88,21 +93,23 @@ public class MemoryCache
 
         //Count the suits of known cards in the game
         for (int i = 0; i < gameState.Count; i++) {
-            switch (gameState[i].suit) {
-                case "S":
-                    spadeCount++;
-                    break;
-                case "H":
-                    heartCount++;
-                    break;
-                case "C":
-                    clubCount++;
-                    break;
-                case "D":
-                    diamondCount++;
-                    break;
-                default:
-                    break;
+            if (gameState[i].isFaceUp) {
+                switch (gameState[i].suit) {
+                    case "S":
+                        spadeCount++;
+                        break;
+                    case "H":
+                        heartCount++;
+                        break;
+                    case "C":
+                        clubCount++;
+                        break;
+                    case "D":
+                        diamondCount++;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
@@ -126,6 +133,28 @@ public class MemoryCache
             }
         }
 
+        //Count the suits of cards in the hand
+        for (int i = 0; i < hand.Length; i++) {
+            if (!(hand[i] is null)) {
+                switch (hand[i].suit) {
+                    case "S":
+                    spadeCount++;
+                    break;
+                case "H":
+                    heartCount++;
+                    break;
+                case "C":
+                    clubCount++;
+                    break;
+                case "D":
+                    diamondCount++;
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+
         //Determine which suit had the largest count
         int max = Math.Max(Math.Max(Math.Max(spadeCount, heartCount), clubCount), diamondCount);
         if (max == 0) { return ""; } //No dominant suit
@@ -137,11 +166,11 @@ public class MemoryCache
     }
 
     //Determine which index in the cache holds the least valuable card
-    private int FindLowestIndex(string dominantSuit, List<Card> gameState) {
+    private int FindLowestIndex(string dominantSuit, List<Card> gameState, Card[] hand) {
         int lowest = Int32.MaxValue;
         int index = 0;
         for (int i = 0; i < cache.Length; i++) {
-            int weight = cache[i].suit == dominantSuit ? MAX_CACHE_SIZE : (CountSuit(cache[i].suit, gameState) - cache[i].value);
+            int weight = cache[i].suit == dominantSuit ? MAX_CACHE_SIZE : (CountSuit(cache[i].suit, gameState, hand) - cache[i].value);
             if (weight < lowest) {
                 lowest = weight;
                 index = i;
