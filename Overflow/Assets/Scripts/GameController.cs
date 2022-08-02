@@ -14,6 +14,7 @@ public class GameController : MonoBehaviour {
 
     public int stashValue { get; private set; } //Holds the value of the top discard card when a player stashed
     public Player stashPlayer { get; private set; } //Holds the player who stashed the card which currently occupies the stash
+    public int highestScore { get; private set; } //Holds the score that is the highest amongst all players
 
     //Fields to help build the card game objects
     public GameObject cardPrefab; //Template to build cards
@@ -156,8 +157,8 @@ public class GameController : MonoBehaviour {
             playerObjs[i].GetComponent<Player>().PrintSet();
         }
         */
-        
-        //StartCoroutine(PlayGame());
+
+        StartCoroutine(PlayGame());
     }
 
     //Starts the game loop
@@ -166,6 +167,7 @@ public class GameController : MonoBehaviour {
             yield return playerObjs[0].GetComponent<Player>().Play();
 
             yield return StickyRule(playerObjs[0].GetComponent<Player>());
+            highestScore = DetermineHighestScore();
         }
     }
 
@@ -180,6 +182,18 @@ public class GameController : MonoBehaviour {
                 }
             }
         }
+    }
+
+    //Finds the highest score amongst all players
+    private int DetermineHighestScore() {
+        int max = 0;
+        for (int i = 0; i < playerObjs.Length; i++) {
+            Player player = playerObjs[i].GetComponent<Player>();
+            if (player.score > max) {
+                max = player.score;
+            }
+        }
+        return max;
     }
 
     //Moves a card from one position to another position and updates the game decks accordingly
