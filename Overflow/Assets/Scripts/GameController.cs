@@ -163,11 +163,14 @@ public class GameController : MonoBehaviour {
 
     //Starts the game loop
     private IEnumerator PlayGame() {
+        uint index = 0;
         while (true) {
-            yield return playerObjs[0].GetComponent<Player>().Play();
+            yield return playerObjs[index%2].GetComponent<Player>().Play();
 
-            yield return StickyRule(playerObjs[0].GetComponent<Player>());
+            yield return StickyRule(playerObjs[index%2].GetComponent<Player>());
             highestScore = DetermineHighestScore();
+
+            index++;
         }
     }
 
