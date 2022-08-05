@@ -47,7 +47,7 @@ public class Computer : Player
     //Determines the weight for the swap action
     private float CalculateSwapWeight() {
         if (Exists(game.discard[game.discard.Count - 1].isRed, hand)) { //Computer has a card that matches in color with top of discard
-            //Formula: (player's score) + (expected gain from spill)
+            //Formula: (player's score) + (expected gain from another player's spill)
             float fail = ProbabilitySpillFails(game.discard[game.discard.Count - 1].suit);
             float expectedGain = (score * fail) + (-13 * (1 - fail));
             return score + expectedGain;
@@ -57,11 +57,13 @@ public class Computer : Player
         }
     }
 
+    //Calculates the probability that a spill will fail based on the top of the discard
     private float ProbabilitySpillFails(string suit) {
         float knownCount = memory.CountSuit(suit, game.sets, hand);
         float numerator = SUIT_SIZE - knownCount;
         float denominator = game.deck.Count;
-        return (numerator / denominator) + (numerator / (denominator - 1)) + (numerator / (denominator - 2));
+        float probability = (numerator / denominator) + (numerator / (denominator - 1)) + (numerator / (denominator - 2));
+        return (probability > 1) ? 1.0f : probability;
     }
 
     //Notifies player to add card to memory cache
