@@ -63,7 +63,7 @@ public class MemoryCache
         }
     }
 
-    //Counts the number of cards in the cache and game that match the inputted suit
+    //Counts the number of cards in the cache, game, and player hand that match the inputted suit
     public int CountSuit(string suit, List<Card> gameState, Card[] hand) {
         int count = 0;
         for (int i = 0; i < gameState.Count; i++) {
@@ -78,6 +78,27 @@ public class MemoryCache
         }
         for (int i = 0; i < hand.Length; i++) {
             if (!(hand[i] is null) && hand[i].suit == suit) { //Found a card in the hand that matches in suit, increment count
+                count++;
+            }
+        }
+        return count;
+    }
+
+    //Counts the number of cards in the cache, game, and player hand that are less than or equal to the inputted rank
+    public int CountRank(int rank, List<Card> gameState, Card[] hand) {
+        int count = 0;
+        for (int i = 0; i < gameState.Count; i++) {
+            if (gameState[i].isFaceUp && gameState[i].value <= rank) { //Found a card in the game that is less than or equal in value, increment count
+                count++;
+            }
+        }
+        for (int i = 0; i < cache.Length; i++) {
+            if (!(cache[i] is null) && cache[i].value <= rank) { //Found a card in the cache that is less than or equal in value, increment count
+                count++;
+            }
+        }
+        for (int i = 0; i < hand.Length; i++) {
+            if (!(hand[i] is null) && hand[i].value <= rank) { //Found a card in the hand that is less than or equal in value, increment count
                 count++;
             }
         }

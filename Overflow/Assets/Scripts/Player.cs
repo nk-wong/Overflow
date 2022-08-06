@@ -96,6 +96,17 @@ public abstract class Player : MonoBehaviour
         return false;
     }
 
+    //Returns true if a card in the Card array is greater than the input
+    protected bool ExistsGreater(int rank, Card[] type) {
+        for (int i = 0; i < type.Length; i++) {
+            if (!(type[i] is null) && type[i].value > rank) { //Found card higher in value than input
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     //Adds the inputted card to the player's hand
     public virtual GameObject AddToHand(Card card) {
         //Find the index that the new card was added into

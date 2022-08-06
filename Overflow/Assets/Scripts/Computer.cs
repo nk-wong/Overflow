@@ -12,7 +12,8 @@ public class Computer : Player
     private float stashWeight; //Heuristic for choosing the stash move
     private float spillWeight; //Heuristic for choosing the spill move
 
-    private readonly int SUIT_SIZE = 13; //The number of cards in one suit
+    private readonly int MAX_SUIT_SIZE = 13; //The number of cards in one suit
+    private readonly int MAX_RANK_VALUE = 13; //The highest value a card can have
 
     //TODO
     public override IEnumerator Play() {
@@ -24,7 +25,7 @@ public class Computer : Player
     private void ChooseMove() {
         snatchWeight = CalculateSnatchWeight();
         swapWeight = CalculateSwapWeight();
-        stashWeight = 0; //TODO
+        stashWeight = CalculateStashWeight();
         spillWeight = 0; //TODO
 
         Debug.Log(snatchWeight);
@@ -49,7 +50,7 @@ public class Computer : Player
         if (Exists(game.discard[game.discard.Count - 1].isRed, hand)) { //Computer has a card that matches in color with top of discard
             //Formula: (player's score) + (expected gain from another player's spill)
             float fail = ProbabilitySpillFails(game.discard[game.discard.Count - 1].suit);
-            float expectedGain = (score * fail) + (-13 * (1 - fail));
+            float expectedGain = (score * (1 - fail)) + (-MAX_RANK_VALUE * fail);
             return score + expectedGain;
         }
         else {
@@ -57,12 +58,42 @@ public class Computer : Player
         }
     }
 
-    //Calculates the probability that a spill will fail based on the top of the discard
+    //Determines the weight for the stash action
+    private float CalculateStashWeight() {
+        if (game.stash.Count == 0) { //Stash is empty, computer can place a card in the stash
+            //Formula: (player's score) + (expected gain from successfully stashing a card)
+            float fail = ProbabilityStashFails(game.discard[game.discard.Count - 1].value);
+            float expectedGain = 0.0f;
+            if (ExistsGreater(game.discard[game.discard.Count - 1].value, hand)) {
+                expectedGain = ((game.discard[game.discard.Count - 1].value + 1) * fail) + (-(game.discard[game.discard.Count - 1].value + 1) * (1 - fail));
+            }
+            else {
+                expectedGain = (MAX_RANK_VALUE * (1 - fail)) + (-MAX_RANK_VALUE * fail);
+            }
+            return score + expectedGain;
+        }
+        else { //Stash is occupied, computer can steal from the stash
+            float fail = ProbabilityStashFails(game.stashValue);
+            float expectedGain = ((game.stashValue + 1) * (1 - fail)) + (-MAX_RANK_VALUE * fail);
+            return score + expectedGain;
+        }
+    }
+
+    //Calculates the probability that a spill will fail
     private float ProbabilitySpillFails(string suit) {
         float knownCount = memory.CountSuit(suit, game.sets, hand);
-        float numerator = SUIT_SIZE - knownCount;
+        float numerator = MAX_SUIT_SIZE - knownCount;
         float denominator = game.deck.Count;
         float probability = (numerator / denominator) + (numerator / (denominator - 1)) + (numerator / (denominator - 2));
+        return (probability > 1) ? 1.0f : probability;
+    }
+
+    //Calculates the probability that a stash will result in a sticky card
+    private float ProbabilityStashFails(int stashVal) {
+        float knownCount = memory.CountRank(stashVal, game.sets, hand);
+        float numerator = (stashVal * 4) - knownCount;
+        float denominator = game.deck.Count + game.stash.Count;
+        float probability = numerator / denominator;
         return (probability > 1) ? 1.0f : probability;
     }
 
