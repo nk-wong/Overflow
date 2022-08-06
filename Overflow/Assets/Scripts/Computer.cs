@@ -26,7 +26,7 @@ public class Computer : Player
         snatchWeight = CalculateSnatchWeight();
         swapWeight = CalculateSwapWeight();
         stashWeight = CalculateStashWeight();
-        spillWeight = 0; //TODO
+        spillWeight = CalculateSpillWeight();
 
         Debug.Log(snatchWeight);
         Debug.Log(swapWeight);
@@ -77,6 +77,13 @@ public class Computer : Player
             float expectedGain = ((game.stashValue + 1) * (1 - fail)) + (-MAX_RANK_VALUE * fail);
             return score + expectedGain;
         }
+    }
+
+    //Determines the weight for the spill action
+    private float CalculateSpillWeight() {
+        float fail = ProbabilitySpillFails(game.discard[game.discard.Count - 1].suit);
+        float expectedGain = (HighestCard(hand).value * (1 - fail)) + (-score * fail);
+        return score + expectedGain;
     }
 
     //Calculates the probability that a spill will fail

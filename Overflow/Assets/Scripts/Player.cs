@@ -107,6 +107,17 @@ public abstract class Player : MonoBehaviour
         return false;
     }
 
+    //Returns the card with the highest value in a Card array
+    protected Card HighestCard(Card[] type) {
+        int index = 0;
+        for (int i = 0; i < type.Length; i++) {
+            if (!(type[i] is null) && type[i].value > index) {
+                index = i;
+            }
+        }
+        return type[index];
+    }
+
     //Adds the inputted card to the player's hand
     public virtual GameObject AddToHand(Card card) {
         //Find the index that the new card was added into
