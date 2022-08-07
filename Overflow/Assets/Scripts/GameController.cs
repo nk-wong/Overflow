@@ -176,7 +176,8 @@ public class GameController : MonoBehaviour {
 
     //Removes all non-sticky cards from a player's set if the final card added to the set was a sticky
     private IEnumerator StickyRule(Player player) {
-        if (player.SetIsFull() && player.score == 0) {
+        //The player's set is full and the last added card was a sticky card
+        if (player.SetCount() == player.set.Length && player.score == 0) {
             for (int i = 0; i < player.set.Length; i++) {
                 if (player.set[i].isFaceUp) { //Remove face up set cards
                     //Move non-sticky set cards to the discard

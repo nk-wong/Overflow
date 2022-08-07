@@ -146,7 +146,7 @@ public abstract class Player : MonoBehaviour
         }
 
         //If the final card added to a set is sticky, player loses all their points
-        score = (card.isFaceUp == false && SetIsFull()) ? 0 : CalculateScore();
+        score = (card.isFaceUp == false && SetCount() == set.Length) ? 0 : CalculateScore();
         Debug.Log(this.name + " score is " + score);
 
         //Use the index to find the GameObject
@@ -160,14 +160,15 @@ public abstract class Player : MonoBehaviour
         }
     }
 
-    //Returns true if the set is fully occupied by cards
-    public bool SetIsFull() {
+    //Returns the number of cards that have been set by the player
+    public int SetCount() {
+        int count = 0;
         for (int i = 0; i < set.Length; i++) {
-            if (set[i] is null) { //Found an empty spot
-                return false;
+            if (!(set[i] is null)) { //Found a set card
+                count++;
             }
         }
-        return true;
+        return count;
     }
 
     //Determines the player's score based on the value of the cards that have been set
