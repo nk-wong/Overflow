@@ -18,7 +18,7 @@ public class Computer : Player
     //TODO
     public override IEnumerator Play() {
         ChooseMove();
-        
+
         ChooseCard();
 
         yield return null;
@@ -95,6 +95,9 @@ public class Computer : Player
                 else {
                     selectedCard = LowestCard(hand);
                 }
+                break;
+            case Move.SPILL: //Select the card with the highest value
+                selectedCard = HighestCard(hand);
                 break;
             default:
                 Debug.Log(this.name + " could not select a card to player for move " + selectedMove);
