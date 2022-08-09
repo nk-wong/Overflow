@@ -19,6 +19,8 @@ public class Computer : Player
     public override IEnumerator Play() {
         ChooseMove();
 
+        ChooseCard();
+
         yield return null;
     }
 
@@ -50,26 +52,39 @@ public class Computer : Player
 
         //Determine move to make
         float tolerance = 0.0001f;
-        if (Math.Abs(max - snatchWeight) <= tolerance) {
-            Debug.Log(this.name + " has decided to snatch");
+        if (Math.Abs(max - snatchWeight) <= tolerance) { //Snatch
             selectedMove = Move.SNATCH;
         }
-        else if (Math.Abs(max - swapWeight) <= tolerance) {
-            Debug.Log(this.name + " has decided to swap");
+        else if (Math.Abs(max - swapWeight) <= tolerance) { //Swap
             selectedMove = Move.SWAP;
         }
-        else if (Math.Abs(max - stashWeight) <= tolerance) {
-            Debug.Log(this.name + " has decided to stash");
+        else if (Math.Abs(max - stashWeight) <= tolerance) { //Stash
             selectedMove = Move.STASH;
         }
-        else if (Math.Abs(max - spillWeight) <= tolerance) {
-            Debug.Log(this.name + " has decided to spill");
+        else if (Math.Abs(max - spillWeight) <= tolerance) { //Spill
             selectedMove = Move.SPILL;
         }
-        else {
+        else { //Undefined
             Debug.Log(this.name + " was unable to choose a move");
             selectedMove = Move.UNDEFINED;
         }
+        Debug.Log(this.name + " has decided to " + selectedMove);
+    }
+
+    private void ChooseCard() {
+        switch(selectedMove) {
+            case Move.SNATCH:
+                for (int i = 0; i < hand.Length; i++) {
+                    if (hand[i].value == game.discard[game.discard.Count - 1].value) {
+                        selectedCard = hand[i];
+                    }
+                }
+                break;
+            default:
+                Debug.Log(this.name + " could not select a card to player for move " + selectedMove);
+                break;
+        }
+        Debug.Log("Selected card: " + selectedCard.rank + selectedCard.suit);
     }
 
     //Determines the weight for the snatch action
