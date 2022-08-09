@@ -111,7 +111,18 @@ public abstract class Player : MonoBehaviour
     protected Card HighestCard(Card[] type) {
         int index = 0;
         for (int i = 0; i < type.Length; i++) {
-            if (!(type[i] is null) && type[i].value > index) {
+            if (!(type[i] is null) && type[i].value > type[index].value) {
+                index = i;
+            }
+        }
+        return type[index];
+    }
+
+    //Returns the card with the lowest value in the Card array
+    protected Card LowestCard(Card[] type) {
+        int index = 0;
+        for (int i = 0; i < type.Length; i++) {
+            if (!(type[i] is null) && type[i].value < type[index].value) {
                 index = i;
             }
         }

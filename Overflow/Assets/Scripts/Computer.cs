@@ -18,7 +18,7 @@ public class Computer : Player
     //TODO
     public override IEnumerator Play() {
         ChooseMove();
-
+        
         ChooseCard();
 
         yield return null;
@@ -87,6 +87,14 @@ public class Computer : Player
                     int i = rand.Next(hand.Length);
                     selectedCard = hand[i];
                 } while (selectedCard.isRed != game.discard[game.discard.Count - 1].isRed);
+                break;
+            case Move.STASH: //If hand has a card higher in value than discard, choose the highest value card, else choose the lowest value card
+                if (ExistsGreater(game.discard[game.discard.Count - 1].value, hand)) {
+                    selectedCard = HighestCard(hand);
+                }
+                else {
+                    selectedCard = LowestCard(hand);
+                }
                 break;
             default:
                 Debug.Log(this.name + " could not select a card to player for move " + selectedMove);
