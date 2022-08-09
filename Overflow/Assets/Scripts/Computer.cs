@@ -71,14 +71,22 @@ public class Computer : Player
         Debug.Log(this.name + " has decided to " + selectedMove);
     }
 
+    //Selects the appropriate card based on the selected move
     private void ChooseCard() {
         switch(selectedMove) {
-            case Move.SNATCH:
+            case Move.SNATCH: //Select the first card that matches in value with top of discard
                 for (int i = 0; i < hand.Length; i++) {
                     if (hand[i].value == game.discard[game.discard.Count - 1].value) {
                         selectedCard = hand[i];
                     }
                 }
+                break;
+            case Move.SWAP: //Select the first random card that matches in color with top of discard
+                do {
+                    System.Random rand = new System.Random();
+                    int i = rand.Next(hand.Length);
+                    selectedCard = hand[i];
+                } while (selectedCard.isRed != game.discard[game.discard.Count - 1].isRed);
                 break;
             default:
                 Debug.Log(this.name + " could not select a card to player for move " + selectedMove);
