@@ -63,6 +63,72 @@ public abstract class Player : MonoBehaviour
         return false;
     }
 
+    //Returns true if a card in the Card array matches in suit with the input
+    protected bool Exists(string suit, Card[] type) {
+        for (int i = 0; i < type.Length; i++) {
+            if (!(type[i] is null) && suit == type[i].suit) { //Found card that matches in suit
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    //Returns true if a card in the Card array matches in rank with the input
+    protected bool Exists(int rank, Card[] type) {
+        for (int i = 0; i < type.Length; i++) {
+            if (!(type[i] is null) && rank == type[i].value) { //Found card that matches in rank
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    //Returns true if a card in the Card array matches in color with the input
+    protected bool Exists(bool color, Card[] type) {
+        for (int i = 0; i < type.Length; i++) {
+            if (!(type[i] is null) && type[i].isRed == color) { //Found card that matches in color
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    //Returns true if a card in the Card array is greater than the input
+    protected bool ExistsGreater(int rank, Card[] type) {
+        for (int i = 0; i < type.Length; i++) {
+            if (!(type[i] is null) && type[i].value > rank) { //Found card higher in value than input
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    //Returns the card with the highest value in a Card array
+    protected Card HighestCard(Card[] type) {
+        int index = 0;
+        for (int i = 0; i < type.Length; i++) {
+            if (!(type[i] is null) && type[i].value > type[index].value) {
+                index = i;
+            }
+        }
+        return type[index];
+    }
+
+    //Returns the card with the lowest value in the Card array
+    protected Card LowestCard(Card[] type) {
+        int index = 0;
+        for (int i = 0; i < type.Length; i++) {
+            if (!(type[i] is null) && type[i].value < type[index].value) {
+                index = i;
+            }
+        }
+        return type[index];
+    }
+
     //Adds the inputted card to the player's hand
     public virtual GameObject AddToHand(Card card) {
         //Find the index that the new card was added into
@@ -91,7 +157,7 @@ public abstract class Player : MonoBehaviour
         }
 
         //If the final card added to a set is sticky, player loses all their points
-        score = (card.isFaceUp == false && SetIsFull()) ? 0 : CalculateScore();
+        score = (card.isFaceUp == false && SetCount() == set.Length) ? 0 : CalculateScore();
         Debug.Log(this.name + " score is " + score);
 
         //Use the index to find the GameObject
@@ -105,14 +171,15 @@ public abstract class Player : MonoBehaviour
         }
     }
 
-    //Returns true if the set is fully occupied by cards
-    public bool SetIsFull() {
+    //Returns the number of cards that have been set by the player
+    public int SetCount() {
+        int count = 0;
         for (int i = 0; i < set.Length; i++) {
-            if (set[i] is null) { //Found an empty spot
-                return false;
+            if (!(set[i] is null)) { //Found a set card
+                count++;
             }
         }
-        return true;
+        return count;
     }
 
     //Determines the player's score based on the value of the cards that have been set

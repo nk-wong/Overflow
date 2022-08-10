@@ -14,6 +14,7 @@ public class GameController : MonoBehaviour {
 
     public int stashValue { get; private set; } //Holds the value of the top discard card when a player stashed
     public Player stashPlayer { get; private set; } //Holds the player who stashed the card which currently occupies the stash
+    public int highestScore { get; private set; } //Holds the score that is the highest amongst all players
 
     //Fields to help build the card game objects
     public GameObject cardPrefab; //Template to build cards
@@ -123,24 +124,25 @@ public class GameController : MonoBehaviour {
         for (int i = 0; i < NUM_PLAYERS; i++) {
             playerObjs[i].GetComponent<Player>().PrintHand();
         }
-        
-        yield return playerObjs[0].GetComponent<Player>().Play();
-        yield return playerObjs[0].GetComponent<Player>().Play();
-        yield return playerObjs[0].GetComponent<Player>().Play();
-        yield return playerObjs[0].GetComponent<Player>().Play();
 
+        yield return playerObjs[0].GetComponent<Player>().Play();
+        yield return playerObjs[0].GetComponent<Player>().Play();
+        yield return playerObjs[0].GetComponent<Player>().Play();
+        yield return playerObjs[0].GetComponent<Player>().Play();
+        
         for (int i = 0; i < NUM_PLAYERS; i++) {
             playerObjs[i].GetComponent<Player>().PrintHand();
         }
         */
 
         /*
-        for (int i = 0; i < 32; i++) {
+        for (int i = 0; i < 20; i++) {
             Card next = deck[deck.Count - 1];
             next.isFaceUp = true;
             yield return MoveToDiscard(next);
         }
         */
+        
 
         /*
         for (int i = 0; i < 20; i++) {
@@ -155,21 +157,27 @@ public class GameController : MonoBehaviour {
             playerObjs[i].GetComponent<Player>().PrintSet();
         }
         */
+
         StartCoroutine(PlayGame());
     }
 
     //Starts the game loop
     private IEnumerator PlayGame() {
+        uint index = 0;
         while (true) {
-            yield return playerObjs[0].GetComponent<Player>().Play();
+            yield return playerObjs[index%NUM_PLAYERS].GetComponent<Player>().Play();
 
-            yield return StickyRule(playerObjs[0].GetComponent<Player>());
+            yield return StickyRule(playerObjs[index%NUM_PLAYERS].GetComponent<Player>());
+            highestScore = DetermineHighestScore();
+
+            index++;
         }
     }
 
     //Removes all non-sticky cards from a player's set if the final card added to the set was a sticky
     private IEnumerator StickyRule(Player player) {
-        if (player.SetIsFull() && player.score == 0) {
+        //The player's set is full and the last added card was a sticky card
+        if (player.SetCount() == player.set.Length && player.score == 0) {
             for (int i = 0; i < player.set.Length; i++) {
                 if (player.set[i].isFaceUp) { //Remove face up set cards
                     //Move non-sticky set cards to the discard
@@ -178,6 +186,18 @@ public class GameController : MonoBehaviour {
                 }
             }
         }
+    }
+
+    //Finds the highest score amongst all players
+    private int DetermineHighestScore() {
+        int max = 0;
+        for (int i = 0; i < playerObjs.Length; i++) {
+            Player player = playerObjs[i].GetComponent<Player>();
+            if (player.score > max) {
+                max = player.score;
+            }
+        }
+        return max;
     }
 
     //Moves a card from one position to another position and updates the game decks accordingly
@@ -340,6 +360,8 @@ public class GameController : MonoBehaviour {
             }
         }
         if (discard[discard.Count - 1].suit != spill[spill.Count - 1].suit) { //If the spill was successful, player can set a card
+            //Move card from player's hand to the player's set
+            handCard.isFaceUp = true;
             GameObject obj1 = player.AddToSet(handCard);
             player.RemoveFromHand(handCard);
             yield return MoveToSets(handCard, obj1);
