@@ -28,6 +28,8 @@ public class Computer : Player
         ChooseMove();
 
         ChooseCard();
+
+        yield return MakeMove();
     }
 
     //Calculates the heuristic of each move to find out which move to make

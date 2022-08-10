@@ -360,6 +360,8 @@ public class GameController : MonoBehaviour {
             }
         }
         if (discard[discard.Count - 1].suit != spill[spill.Count - 1].suit) { //If the spill was successful, player can set a card
+            //Move card from player's hand to the player's set
+            handCard.isFaceUp = true;
             GameObject obj1 = player.AddToSet(handCard);
             player.RemoveFromHand(handCard);
             yield return MoveToSets(handCard, obj1);
