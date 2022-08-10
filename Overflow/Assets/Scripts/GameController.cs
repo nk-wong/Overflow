@@ -371,6 +371,15 @@ public class GameController : MonoBehaviour {
             GameObject obj2 = player.AddToHand(gain);
             yield return MoveToHands(gain, obj2);
         }
+        else { //Else player loses all non-sticky cards
+            for (int i = 0; i < player.set.Length; i++) {
+                if (!(player.set[i] is null) && player.set[i].isFaceUp) { //Remove face up set cards
+                    //Move non-sticky set cards to the discard
+                    yield return MoveToDiscard(player.set[i]);
+                    player.RemoveFromSet(player.set[i]);
+                }
+            }
+        }
     }
 
     //Notifies computer players that a card has been placed in the discard pile
