@@ -165,9 +165,9 @@ public class GameController : MonoBehaviour {
     private IEnumerator PlayGame() {
         uint index = 0;
         while (true) {
-            yield return playerObjs[index%2].GetComponent<Player>().Play();
+            yield return playerObjs[index%NUM_PLAYERS].GetComponent<Player>().Play();
 
-            yield return StickyRule(playerObjs[index%2].GetComponent<Player>());
+            yield return StickyRule(playerObjs[index%NUM_PLAYERS].GetComponent<Player>());
             highestScore = DetermineHighestScore();
 
             index++;
