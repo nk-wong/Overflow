@@ -323,7 +323,7 @@ public class GameController : MonoBehaviour {
             player.RemoveFromHand(handCard);
             yield return MoveToStash(handCard);
 
-            //Set the stash value
+            //Set the stash value and player
             stashValue = discard[discard.Count - 1].value;
             stashPlayer = player;
 
@@ -340,6 +340,10 @@ public class GameController : MonoBehaviour {
 
             //Determine if stashed card will be a sticky card
             stashedCard.isFaceUp = stashedCard.value > stashValue ? true : false;
+
+            //Reset the stash value and player
+            stashValue = 0;
+            stashPlayer = null;
 
             //Move the stashed card from the stash pile to the player's set
             GameObject obj = player.AddToSet(stashedCard);
