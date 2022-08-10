@@ -15,13 +15,19 @@ public class Computer : Player
     private readonly int MAX_SUIT_SIZE = 13; //The number of cards in one suit
     private readonly int MAX_RANK_VALUE = 13; //The highest value a card can have
 
-    //TODO
     public override IEnumerator Play() {
+        //Reset selections before making move
+        selectedMove = Move.UNDEFINED;
+        selectedCard = null;
+
+        //Simulate thinking time for computer
+        System.Random rand = new System.Random();
+        float waitTime = (float)rand.NextDouble() + 1.5f;
+        yield return new WaitForSeconds(waitTime);
+
         ChooseMove();
 
         ChooseCard();
-
-        yield return null;
     }
 
     //Calculates the heuristic of each move to find out which move to make
@@ -99,7 +105,7 @@ public class Computer : Player
             case Move.SPILL: //Select the card with the highest value
                 selectedCard = HighestCard(hand);
                 break;
-            default:
+            default: //Undefined
                 Debug.Log(this.name + " could not select a card to player for move " + selectedMove);
                 break;
         }
