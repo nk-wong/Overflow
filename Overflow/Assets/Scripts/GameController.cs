@@ -128,6 +128,8 @@ public class GameController : MonoBehaviour {
     private IEnumerator PlayGame() {
         uint index = 0;
         while (true) {
+            yield return ResolveStashPile(playerObjs[index%NUM_PLAYERS].GetComponent<Player>());
+
             yield return playerObjs[index%NUM_PLAYERS].GetComponent<Player>().Play();
 
             yield return StickyRule(playerObjs[index%NUM_PLAYERS].GetComponent<Player>());
@@ -169,6 +171,14 @@ public class GameController : MonoBehaviour {
     private IEnumerator ClearSpillPile() {
         while (spill.Count > 0) { //While there are cards in the spill pile, move to discard pile
             yield return MoveToDiscard(spill[0]);
+        }
+    }
+
+    //Returns the stashed card to the player who stashed the card
+    private IEnumerator ResolveStashPile(Player currentPlayer) {
+        if (!(stashPlayer is null) && stashPlayer.name == currentPlayer.name) { //There exists a player who stashed a card which has not been stolen
+            //The player will steal their own stashed card
+            yield return Stash(null, currentPlayer);
         }
     }
 
