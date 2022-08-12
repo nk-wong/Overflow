@@ -169,6 +169,7 @@ public class GameController : MonoBehaviour {
 
             yield return StickyRule(playerObjs[index%NUM_PLAYERS].GetComponent<Player>());
             highestScore = DetermineHighestScore();
+            yield return ReshuffleDeck();
 
             index++;
         }
@@ -198,6 +199,34 @@ public class GameController : MonoBehaviour {
             }
         }
         return max;
+    }
+
+    //Reshuffles the list of cards once the list has less than three cards remaining
+    private IEnumerator ReshuffleDeck() {
+        if (deck.Count <= 3) {
+            foreach (GameObject obj in playerObjs) { //Clear the memory of each computer in the game
+                Computer computer = obj.GetComponent<Computer>();
+                if (!(computer is null)) {
+                    computer.Notify();
+                }
+            }
+
+            PrintList(deck);
+            Debug.Log("Moving to reshuffle");
+            List<Card> temp = new List<Card>(deck); //Store any remaining cards in the deck
+            deck.Clear(); //Clear out the data in the deck
+            for (int i = discard.Count - 2; i >= 0; i--) { //Move cards, except for top of discard, from the discard to the deck
+                Card card = discard[i];
+                card.isFaceUp = false;
+                yield return MoveToDeck(card, 0);
+            }
+            ShuffleDeck(deck); //Shuffle the cards that were added from the discard
+            deck.AddRange(temp); //Add back the original deck cards on the top of the deck
+            yield return MoveToDiscard(discard[discard.Count - 1]); //Notify players that the top of the discard still remains in the discard pile
+            PrintList(deck);
+            Debug.Log("Print discard");
+            PrintList(discard);
+        }
     }
 
     //Moves a card from one position to another position and updates the game decks accordingly
