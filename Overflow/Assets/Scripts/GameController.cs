@@ -15,6 +15,7 @@ public class GameController : MonoBehaviour {
     public int stashValue { get; private set; } //Holds the value of the top discard card when a player stashed
     public Player stashPlayer { get; private set; } //Holds the player who stashed the card which currently occupies the stash
     public int highestScore { get; private set; } //Holds the score that is the highest amongst all players
+    public bool isGameOver { get; private set; } //Determines whether the game loop should continue
 
     //Fields to help build the card game objects
     public GameObject cardPrefab; //Template to build cards
@@ -127,7 +128,7 @@ public class GameController : MonoBehaviour {
     //Starts the game loop
     private IEnumerator PlayGame() {
         uint index = 0;
-        while (true) {
+        while (!isGameOver) {
             yield return ResolveStashPile(playerObjs[index%NUM_PLAYERS].GetComponent<Player>());
 
             yield return playerObjs[index%NUM_PLAYERS].GetComponent<Player>().Play();
@@ -137,8 +138,11 @@ public class GameController : MonoBehaviour {
             yield return ClearSpillPile();
             yield return ReshuffleDeck();
 
+            isGameOver = DetermineWin(playerObjs[index%NUM_PLAYERS].GetComponent<Player>());
+
             index++;
         }
+        Debug.Log("Game finished");
     }
 
     //Removes all non-sticky cards from a player's set if the final card added to the set was a sticky
@@ -165,6 +169,14 @@ public class GameController : MonoBehaviour {
             }
         }
         return max;
+    }
+
+    //Returns true if a player has ended the game
+    private bool DetermineWin(Player currentPlayer) {
+        if (currentPlayer.SetCount() == currentPlayer.set.Length) { //Found player with set cards to end the game
+            return true;
+        }
+        return false;
     }
 
     //Moves the cards currently in the spill pile to the discard pile
