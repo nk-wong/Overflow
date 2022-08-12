@@ -129,20 +129,24 @@ public class GameController : MonoBehaviour {
     private IEnumerator PlayGame() {
         uint index = 0;
         while (!isGameOver) {
-            yield return ResolveStashPile(playerObjs[index%NUM_PLAYERS].GetComponent<Player>());
+            //Get player for turn
+            Player player = playerObjs[index%NUM_PLAYERS].GetComponent<Player>();
 
-            yield return playerObjs[index%NUM_PLAYERS].GetComponent<Player>().Play();
-
-            yield return StickyRule(playerObjs[index%NUM_PLAYERS].GetComponent<Player>());
-            highestScore = DetermineHighestScore();
+            //Card management
+            yield return ResolveStashPile(player);
+            yield return player.Play();
+            yield return StickyRule(player);
+            
+            //Pile management
             yield return ClearSpillPile();
             yield return ReshuffleDeck();
 
-            isGameOver = DetermineWin(playerObjs[index%NUM_PLAYERS].GetComponent<Player>());
+            //Game management
+            highestScore = DetermineHighestScore();
+            isGameOver = DetermineWin(player);
 
             index++;
         }
-        Debug.Log("Game finished");
     }
 
     //Removes all non-sticky cards from a player's set if the final card added to the set was a sticky
