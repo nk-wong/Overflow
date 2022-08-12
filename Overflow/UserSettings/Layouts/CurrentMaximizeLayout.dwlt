@@ -24,7 +24,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 2031
+  controlID: 3171
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -95,23 +95,23 @@ MonoBehaviour:
       serializedVersion: 2
       x: 0
       y: 21
-      width: 722
-      height: 258.66666
-    m_Scale: {x: 0.7185185, y: 0.7185185}
-    m_Translation: {x: 361, y: 129.33333}
+      width: 1248
+      height: 528.3333
+    m_Scale: {x: 1, y: 1}
+    m_Translation: {x: 624, y: 264.16666}
     m_MarginLeft: 0
     m_MarginRight: 0
     m_MarginTop: 0
     m_MarginBottom: 0
     m_LastShownAreaInsideMargins:
       serializedVersion: 2
-      x: -502.4227
-      y: -180
-      width: 1004.8454
-      height: 360
+      x: -624
+      y: -264.16666
+      width: 1248
+      height: 528.3333
     m_MinimalGUI: 1
-  m_defaultScale: 0.7185185
-  m_LastWindowPixelSize: {x: 2166, y: 839}
+  m_defaultScale: 1
+  m_LastWindowPixelSize: {x: 3744, y: 1648}
   m_ClearInEditMode: 1
   m_NoCameraWarning: 1
   m_LowResolutionForAspectRatios: 01000000000000000000
@@ -141,7 +141,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 2032
+  controlID: 3172
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -166,7 +166,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 2033
+  controlID: 3173
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
