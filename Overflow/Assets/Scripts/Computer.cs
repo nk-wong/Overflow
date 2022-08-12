@@ -194,4 +194,10 @@ public class Computer : Player
         memory.Add(card, game.sets, hand);
         memory.PrintCache(this.name + ": Noticed the (" + card.rank + card.suit + ") |");
     }
+
+    //Notifies player to clear the memory cache
+    public void Notify() {
+        memory.Clear();
+        memory.PrintCache(this.name + ": Cleared memory");
+    }
  }

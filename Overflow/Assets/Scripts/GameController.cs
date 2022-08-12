@@ -15,6 +15,7 @@ public class GameController : MonoBehaviour {
     public int stashValue { get; private set; } //Holds the value of the top discard card when a player stashed
     public Player stashPlayer { get; private set; } //Holds the player who stashed the card which currently occupies the stash
     public int highestScore { get; private set; } //Holds the score that is the highest amongst all players
+    public bool isGameOver { get; private set; } //Determines whether the game loop should continue
 
     //Fields to help build the card game objects
     public GameObject cardPrefab; //Template to build cards
@@ -120,55 +121,29 @@ public class GameController : MonoBehaviour {
         last.isFaceUp = true; //Flip the card over
         yield return MoveToDiscard(last);
 
-        /*
-        for (int i = 0; i < NUM_PLAYERS; i++) {
-            playerObjs[i].GetComponent<Player>().PrintHand();
-        }
-
-        yield return playerObjs[0].GetComponent<Player>().Play();
-        yield return playerObjs[0].GetComponent<Player>().Play();
-        yield return playerObjs[0].GetComponent<Player>().Play();
-        yield return playerObjs[0].GetComponent<Player>().Play();
-        
-        for (int i = 0; i < NUM_PLAYERS; i++) {
-            playerObjs[i].GetComponent<Player>().PrintHand();
-        }
-        */
-
-        /*
-        for (int i = 0; i < 20; i++) {
-            Card next = deck[deck.Count - 1];
-            next.isFaceUp = true;
-            yield return MoveToDiscard(next);
-        }
-        */
-        
-
-        /*
-        for (int i = 0; i < 20; i++) {
-            Card deckTop = deck[deck.Count - 1];
-            deckTop.isFaceUp = true;
-            GameObject obj = playerObjs[i%4].GetComponent<Player>().AddToSet(deckTop);
-
-            yield return MoveToSets(deckTop, obj);
-        }
-
-        for (int i = 0; i < 4; i++) {
-            playerObjs[i].GetComponent<Player>().PrintSet();
-        }
-        */
-
+        //Start game loop
         StartCoroutine(PlayGame());
     }
 
     //Starts the game loop
     private IEnumerator PlayGame() {
         uint index = 0;
-        while (true) {
-            yield return playerObjs[index%NUM_PLAYERS].GetComponent<Player>().Play();
+        while (!isGameOver) {
+            //Get player for turn
+            Player player = playerObjs[index%NUM_PLAYERS].GetComponent<Player>();
 
-            yield return StickyRule(playerObjs[index%NUM_PLAYERS].GetComponent<Player>());
+            //Card management
+            yield return ResolveStashPile(player);
+            yield return player.Play();
+            yield return StickyRule(player);
+            
+            //Pile management
+            yield return ClearSpillPile();
+            yield return ReshuffleDeck();
+
+            //Game management
             highestScore = DetermineHighestScore();
+            isGameOver = DetermineWin(player);
 
             index++;
         }
@@ -198,6 +173,52 @@ public class GameController : MonoBehaviour {
             }
         }
         return max;
+    }
+
+    //Returns true if a player has ended the game
+    private bool DetermineWin(Player currentPlayer) {
+        if (currentPlayer.SetCount() == currentPlayer.set.Length) { //Found player with set cards to end the game
+            return true;
+        }
+        return false;
+    }
+
+    //Moves the cards currently in the spill pile to the discard pile
+    private IEnumerator ClearSpillPile() {
+        while (spill.Count > 0) { //While there are cards in the spill pile, move to discard pile
+            yield return MoveToDiscard(spill[0]);
+        }
+    }
+
+    //Returns the stashed card to the player who stashed the card
+    private IEnumerator ResolveStashPile(Player currentPlayer) {
+        if (!(stashPlayer is null) && stashPlayer.name == currentPlayer.name) { //There exists a player who stashed a card which has not been stolen
+            //The player will steal their own stashed card
+            yield return Stash(null, currentPlayer);
+        }
+    }
+
+    //Reshuffles the list of cards once the list has less than three cards remaining
+    private IEnumerator ReshuffleDeck() {
+        if (deck.Count <= 3) {
+            foreach (GameObject obj in playerObjs) { //Clear the memory of each computer in the game
+                Computer computer = obj.GetComponent<Computer>();
+                if (!(computer is null)) {
+                    computer.Notify();
+                }
+            }
+
+            List<Card> temp = new List<Card>(deck); //Store any remaining cards in the deck
+            deck.Clear(); //Clear out the data in the deck
+            for (int i = discard.Count - 2; i >= 0; i--) { //Move cards, except for top of discard, from the discard to the deck
+                Card card = discard[i];
+                card.isFaceUp = false;
+                yield return MoveToDeck(card, 0);
+            }
+            ShuffleDeck(deck); //Shuffle the cards that were added from the discard
+            deck.AddRange(temp); //Add back the original deck cards on the top of the deck
+            yield return MoveToDiscard(discard[discard.Count - 1]); //Notify players that the top of the discard still remains in the discard pile
+        }
     }
 
     //Moves a card from one position to another position and updates the game decks accordingly
