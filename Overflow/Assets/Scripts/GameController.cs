@@ -135,7 +135,6 @@ public class GameController : MonoBehaviour {
             //Card management
             yield return ResolveStashPile(player);
             yield return player.Play();
-            yield return StickyRule(player);
             
             //Pile management
             yield return ClearSpillPile();
@@ -146,20 +145,6 @@ public class GameController : MonoBehaviour {
             isGameOver = DetermineWin(player);
 
             index++;
-        }
-    }
-
-    //Removes all non-sticky cards from a player's set if the final card added to the set was a sticky
-    private IEnumerator StickyRule(Player player) {
-        //The player's set is full and the last added card was a sticky card
-        if (player.SetCount() == player.set.Length && player.score == 0) {
-            for (int i = 0; i < player.set.Length; i++) {
-                if (player.set[i].isFaceUp) { //Remove face up set cards
-                    //Move non-sticky set cards to the discard
-                    yield return MoveToDiscard(player.set[i]);
-                    player.RemoveFromSet(player.set[i]);
-                }
-            }
         }
     }
 
@@ -369,6 +354,17 @@ public class GameController : MonoBehaviour {
             //Move the stashed card from the stash pile to the player's set
             GameObject obj = player.AddToSet(stashedCard);
             yield return MoveToSets(stashedCard, obj);
+
+            //The player's set is full and the last added card was a sticky card
+            if (stashedCard.isFaceUp == false && player.SetCount() == player.set.Length) {
+                for (int i = 0; i < player.set.Length; i++) {
+                    if (player.set[i].isFaceUp) { //Remove face up set cards
+                        //Move non-sticky set cards to the discard
+                        yield return MoveToDiscard(player.set[i]);
+                        player.RemoveFromSet(player.set[i]);
+                    }
+                }
+            }
         }
     }
 
