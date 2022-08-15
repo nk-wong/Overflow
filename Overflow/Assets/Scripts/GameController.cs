@@ -146,6 +146,7 @@ public class GameController : MonoBehaviour {
 
             index++;
         }
+        WinScreen.isActive = true;
     }
 
     //Finds the highest score amongst all players
