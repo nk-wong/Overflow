@@ -102,7 +102,7 @@ public class GameController : MonoBehaviour {
             card.SetObject();
 
             //Move each card down the z-axis to prevent cards from existing in the same spot
-            zOffset += 0.1f;
+            zOffset += 0.001f;
         }
     }
 
@@ -292,7 +292,7 @@ public class GameController : MonoBehaviour {
         float zOffset = 0.0f;
         for (int i = 0; i < pile.Count; i++) {
             pile[i].myObj.transform.position = new Vector3(pos.transform.position.x, pos.transform.position.y,  pos.transform.position.z - zOffset);
-            zOffset += 0.1f;
+            zOffset += 0.001f;
         }
     }
 
