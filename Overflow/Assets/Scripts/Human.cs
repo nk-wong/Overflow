@@ -43,6 +43,10 @@ public class Human : Player
     }
 
     public override IEnumerator Play() {
+        //Reset selections before making move
+        selectedMove = Move.UNDEFINED;
+        selectedCard = null;
+
         //Determine which moves the player can make
         EnableInput();
 
@@ -50,8 +54,10 @@ public class Human : Player
         yield return ChooseMove();
 
         //Player selects a card
-        yield return ChooseCard();
-
+        if (selectedMove != Move.STASH || game.stash.Count == 0) { //Player only chooses a card to stash if there is no card occupying the stash
+            yield return ChooseCard();
+        }
+        
         //Player performs the move
         yield return MakeMove();
 
@@ -88,8 +94,7 @@ public class Human : Player
 
     //Resets the selected card and move for the next turn
     private void DisableInput() {
-        selectedMove = Move.UNDEFINED;
-        selectedCard = null;
+
     }
 
     public override GameObject AddToHand(Card card) {
