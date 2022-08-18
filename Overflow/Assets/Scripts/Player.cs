@@ -209,6 +209,9 @@ public abstract class Player : MonoBehaviour
             case Move.SPILL:
                 yield return game.Spill(selectedCard, this);
                 break;
+            case Move.END:
+                yield return null;
+                break;
             default:
                 Debug.Log(this.name + " could not find a move to perform");
                 break;

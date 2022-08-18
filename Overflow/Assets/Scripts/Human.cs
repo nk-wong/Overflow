@@ -7,6 +7,7 @@ public class Human : Player
      
     private bool move = false; //Detemines whether the player can choose a move
     private bool select = false; //Determines whether the player can select a card
+    private bool chain = false; //Determines whether the player can choose to chain spill
 
     // Update is called once per frame
     void Update() {
@@ -29,6 +30,17 @@ public class Human : Player
                 selectedMove = Move.SPILL;
             }
         }
+        if (chain) { //Chain spill has been unlocked
+            if (Input.GetKeyDown(KeyCode.R)) {
+                Debug.Log(this.name + " has decided to spill");
+                selectedMove = Move.SPILL;
+            }
+            if (Input.GetKeyDown(KeyCode.T)) {
+                Debug.Log(this.name + " has decided to end");
+                selectedMove = Move.END;
+            }
+        }
+        //TEMPORARY
 
         if (select) { //Card selection has been unlocked
             if (Input.GetMouseButtonDown(0)) { //Look for a left click
@@ -43,18 +55,23 @@ public class Human : Player
     }
 
     public override IEnumerator Play() {
-        //Reset selections before making move
-        selectedMove = Move.UNDEFINED;
+        //Reset selections before making move or continue with chain spill
+        selectedMove = (selectedMove == Move.SPILL) ? Move.SPILL : Move.UNDEFINED;
         selectedCard = null;
 
         //Determine which moves the player can make
         EnableInput();
 
         //Player selects a move
-        yield return ChooseMove();
+        if (selectedMove != Move.SPILL) { //Player only chooses a move if the player is not chain spilling
+            yield return ChooseMove();
+        }
+        else { //Decide if player should continue chain spills
+            yield return ChooseContinue();
+        }
 
         //Player selects a card
-        if (selectedMove != Move.STASH || game.stash.Count == 0) { //Player only chooses a card to stash if there is no card occupying the stash
+        if (selectedMove != Move.END && (selectedMove != Move.STASH || game.stash.Count == 0)) { //Player only chooses a card when not ending turn or stealing
             yield return ChooseCard();
         }
         
@@ -65,6 +82,7 @@ public class Human : Player
         DisableInput();
     }
 
+    //Chooses the move that the player will make on the turn
     private IEnumerator ChooseMove() {
         //Allow player to select a move
         move = true;
@@ -76,6 +94,7 @@ public class Human : Player
         move = false;
     }
 
+    //Chooses the card that the player will play on the turn
     private IEnumerator ChooseCard() {
         //Allow player to select a card
         select = true;
@@ -85,6 +104,21 @@ public class Human : Player
         }
         //Card has been selected, disable the player's ability to select another card
         select = false;
+    }
+
+    //Chooses whether the player will continue to chain spill
+    private IEnumerator ChooseContinue() {
+        //Player has not decided move yet
+        selectedMove = Move.UNDEFINED;
+
+        //Allow player to choose whether to continue spill
+        chain = true;
+        //Wait until a move has been selected
+        while (selectedMove == Move.UNDEFINED) {
+            yield return null;
+        }
+        //Decision has been made
+        chain = false;
     }
 
     //Enables move buttons based on the state of the game
