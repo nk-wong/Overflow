@@ -400,6 +400,13 @@ public class GameController : MonoBehaviour {
         }
     }
 
+    //Ends the player's turn and clears the spill pile
+    public IEnumerator EndTurn() {
+        while (spill.Count > 0) { //While there are cards in the spill pile, move to discard pile
+            yield return MoveToDiscard(spill[0]);
+        }
+    }
+
     //Notifies computer players that a card has been placed in the discard pile
     private void NotifyAllObservers(Card card) {
         for (int i = 0; i < playerObjs.Length; i++) {

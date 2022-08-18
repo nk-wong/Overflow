@@ -63,7 +63,7 @@ public class Human : Player
         EnableInput();
 
         //Player selects a move
-        if (selectedMove != Move.SPILL) { //Player only chooses a move if the player is not chain spilling
+        if (selectedMove != Move.SPILL || game.spill.Count == 0) { //Player only chooses a move if the player is not chain spilling
             yield return ChooseMove();
         }
         else { //Decide if player should continue chain spills
@@ -84,6 +84,9 @@ public class Human : Player
 
     //Chooses the move that the player will make on the turn
     private IEnumerator ChooseMove() {
+        //Player has not decided move yet
+        selectedMove = Move.UNDEFINED;
+
         //Allow player to select a move
         move = true;
         //Wait until a move has been selected

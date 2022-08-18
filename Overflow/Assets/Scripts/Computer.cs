@@ -14,10 +14,11 @@ public class Computer : Player
 
     private readonly int MAX_SUIT_SIZE = 13; //The number of cards in one suit
     private readonly int MAX_RANK_VALUE = 13; //The highest value a card can have
+    private readonly float CHAIN_SPILL_THRESHOLD = 0.8f; //The threshold that determines whether computer should continue spilling
 
     public override IEnumerator Play() {
-        //Reset selections before making move
-        selectedMove = Move.UNDEFINED;
+        //Reset selections before making move or continue with chain spill
+        selectedMove = (selectedMove == Move.SPILL) ? Move.SPILL : Move.UNDEFINED;
         selectedCard = null;
 
         //Simulate thinking time for computer
@@ -34,47 +35,63 @@ public class Computer : Player
 
     //Calculates the heuristic of each move to find out which move to make
     private void ChooseMove() {
-        //Find out the strength of each move
-        snatchWeight = CalculateSnatchWeight();
-        swapWeight = CalculateSwapWeight();
-        stashWeight = CalculateStashWeight();
-        spillWeight = CalculateSpillWeight();
-
-        Debug.Log(this.name + "|" + snatchWeight + "|" + swapWeight + "|" + stashWeight + "|" + spillWeight + "|");
-
-        //Get the strongest move
-        float max = Math.Max(Math.Max(Math.Max(snatchWeight, swapWeight), stashWeight), spillWeight);
-
-        if ((SetCount() == set.Length - 1) && (max - game.highestScore) < 0) { //If computer cannot win from strongest move, take the least risky move
-            //Find out the least risky move
-            snatchWeight = (snatchWeight == Int32.MinValue) ? snatchWeight : -(snatchWeight - game.highestScore);
-            swapWeight = (swapWeight == Int32.MinValue) ? swapWeight : -(swapWeight - game.highestScore);
-            stashWeight = -(stashWeight - game.highestScore);
-            spillWeight = -(spillWeight - game.highestScore);
-
-            //Get the weakest move
-            max = Math.Max(Math.Max(Math.Max(snatchWeight, swapWeight), stashWeight), spillWeight);
+        if (selectedMove != Move.SPILL || game.spill.Count == 0) { //Choose move
+            //Find out the strength of each move
+            snatchWeight = CalculateSnatchWeight();
+            swapWeight = CalculateSwapWeight();
+            stashWeight = CalculateStashWeight();
+            spillWeight = CalculateSpillWeight();
 
             Debug.Log(this.name + "|" + snatchWeight + "|" + swapWeight + "|" + stashWeight + "|" + spillWeight + "|");
-        }
 
-        //Determine move to make
-        float tolerance = 0.0001f;
-        if (Math.Abs(max - snatchWeight) <= tolerance) { //Snatch
-            selectedMove = Move.SNATCH;
+            //Get the strongest move
+            float max = Math.Max(Math.Max(Math.Max(snatchWeight, swapWeight), stashWeight), spillWeight);
+
+            if ((SetCount() == set.Length - 1) && (max - game.highestScore) < 0) { //If computer cannot win from strongest move, take the least risky move
+                //Find out the least risky move
+                snatchWeight = (snatchWeight == Int32.MinValue) ? snatchWeight : -(snatchWeight - game.highestScore);
+                swapWeight = (swapWeight == Int32.MinValue) ? swapWeight : -(swapWeight - game.highestScore);
+                stashWeight = -(stashWeight - game.highestScore);
+                spillWeight = -(spillWeight - game.highestScore);
+
+                //Get the weakest move
+                max = Math.Max(Math.Max(Math.Max(snatchWeight, swapWeight), stashWeight), spillWeight);
+
+                Debug.Log(this.name + "|" + snatchWeight + "|" + swapWeight + "|" + stashWeight + "|" + spillWeight + "|");
+            }
+
+            //Determine move to make
+            float tolerance = 0.0001f;
+            if (Math.Abs(max - snatchWeight) <= tolerance) { //Snatch
+                selectedMove = Move.SNATCH;
+            }
+            else if (Math.Abs(max - swapWeight) <= tolerance) { //Swap
+                selectedMove = Move.SWAP;
+            }
+            else if (Math.Abs(max - stashWeight) <= tolerance) { //Stash
+                selectedMove = Move.STASH;
+            }
+            else if (Math.Abs(max - spillWeight) <= tolerance) { //Spill
+                selectedMove = Move.SPILL;
+            }
+            else { //Undefined
+                Debug.Log(this.name + " was unable to choose a move");
+                selectedMove = Move.UNDEFINED;
+            }
         }
-        else if (Math.Abs(max - swapWeight) <= tolerance) { //Swap
-            selectedMove = Move.SWAP;
-        }
-        else if (Math.Abs(max - stashWeight) <= tolerance) { //Stash
-            selectedMove = Move.STASH;
-        }
-        else if (Math.Abs(max - spillWeight) <= tolerance) { //Spill
-            selectedMove = Move.SPILL;
-        }
-        else { //Undefined
-            Debug.Log(this.name + " was unable to choose a move");
-            selectedMove = Move.UNDEFINED;
+        else { //Choose to continue spill
+            //Find out if spill odds surpass threshold
+            float fail = ProbabilitySpillFails(game.discard[game.discard.Count - 1].suit);
+            float success = 1.0f - fail;
+
+            Debug.Log(this.name + "| (FAIL) " + fail + "| (SUCCESS) " + success + "|");
+
+            if (success >= CHAIN_SPILL_THRESHOLD) { //Continue spill
+                selectedMove = Move.SPILL;
+            }
+            else { //End turn
+                selectedMove = Move.END;
+            }
         }
         Debug.Log(this.name + " has decided to " + selectedMove);
     }
@@ -106,6 +123,9 @@ public class Computer : Player
                 break;
             case Move.SPILL: //Select the card with the highest value
                 selectedCard = HighestCard(hand);
+                break;
+            case Move.END: //Select the first card in hand
+                selectedCard = hand[0];
                 break;
             default: //Undefined
                 Debug.Log(this.name + " could not select a card to player for move " + selectedMove);
