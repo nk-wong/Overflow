@@ -137,14 +137,16 @@ public class GameController : MonoBehaviour {
             yield return player.Play();
             
             //Pile management
-            yield return ClearSpillPile();
             yield return ReshuffleDeck();
 
             //Game management
             highestScore = DetermineHighestScore();
             isGameOver = DetermineWin(player);
 
-            index++;
+            //Move on to the next player if a spill was not performed by the current player or the spill failed
+            if (player.selectedMove != Move.SPILL || spill.Count == 0) {
+                index++;
+            }
         }
         WinScreen.isActive = true;
     }
@@ -167,13 +169,6 @@ public class GameController : MonoBehaviour {
             return true;
         }
         return false;
-    }
-
-    //Moves the cards currently in the spill pile to the discard pile
-    private IEnumerator ClearSpillPile() {
-        while (spill.Count > 0) { //While there are cards in the spill pile, move to discard pile
-            yield return MoveToDiscard(spill[0]);
-        }
     }
 
     //Returns the stashed card to the player who stashed the card
@@ -377,11 +372,21 @@ public class GameController : MonoBehaviour {
             yield return MoveToSpill(card); //Move to spill pile
             yield return new WaitForSeconds(0.75f); //Allow players to see card before next flip
 
-            if (card.suit == discard[discard.Count - 1].suit) { //Flipped card matches discard suit, end the spill
+            if (card.suit == discard[discard.Count - 1].suit) { //Flipped card matches discard suit, remove non-sticky cards from player's set, clear the spill pile, and end spill
+                for (int j = 0; j < player.set.Length; j++) {
+                    if (!(player.set[j] is null) && player.set[j].isFaceUp) { //Remove face up set cards
+                    //Move non-sticky set cards to the discard
+                    yield return MoveToDiscard(player.set[j]);
+                    player.RemoveFromSet(player.set[j]);
+                    }
+                }
+                while (spill.Count > 0) { //While there are cards in the spill pile, move to discard pile
+                    yield return MoveToDiscard(spill[0]);
+                }
                 break;
             }
         }
-        if (discard[discard.Count - 1].suit != spill[spill.Count - 1].suit) { //If the spill was successful, player can set a card
+        if (spill.Count > 0 && discard[discard.Count - 1].suit != spill[spill.Count - 1].suit) { //If the spill was successful, player can set a card
             //Move card from player's hand to the player's set
             handCard.isFaceUp = true;
             GameObject obj1 = player.AddToSet(handCard);
@@ -393,14 +398,12 @@ public class GameController : MonoBehaviour {
             GameObject obj2 = player.AddToHand(gain);
             yield return MoveToHands(gain, obj2);
         }
-        else { //Else player loses all non-sticky cards
-            for (int i = 0; i < player.set.Length; i++) {
-                if (!(player.set[i] is null) && player.set[i].isFaceUp) { //Remove face up set cards
-                    //Move non-sticky set cards to the discard
-                    yield return MoveToDiscard(player.set[i]);
-                    player.RemoveFromSet(player.set[i]);
-                }
-            }
+    }
+
+    //Ends the player's turn and clears the spill pile
+    public IEnumerator EndTurn() {
+        while (spill.Count > 0) { //While there are cards in the spill pile, move to discard pile
+            yield return MoveToDiscard(spill[0]);
         }
     }
 

@@ -8,7 +8,8 @@ public enum Move {
     SNATCH,
     SWAP,
     STASH,
-    SPILL
+    SPILL,
+    END
 };
 
 public abstract class Player : MonoBehaviour
@@ -21,8 +22,8 @@ public abstract class Player : MonoBehaviour
 
     public int score { get; private set; } //The player's score
 
-    protected Move selectedMove = Move.UNDEFINED; //The move selected by the player
-    protected Card selectedCard; //The card selected by the player
+    public Move selectedMove = Move.UNDEFINED; //The move selected by the player
+    public Card selectedCard; //The card selected by the player
 
     public abstract IEnumerator Play(); //Runs through the player's turn
 
@@ -207,6 +208,9 @@ public abstract class Player : MonoBehaviour
                 break;
             case Move.SPILL:
                 yield return game.Spill(selectedCard, this);
+                break;
+            case Move.END:
+                yield return game.EndTurn();
                 break;
             default:
                 Debug.Log(this.name + " could not find a move to perform");
