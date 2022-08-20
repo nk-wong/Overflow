@@ -16,6 +16,7 @@ public class WinScreen : MonoBehaviour
     {
         if (isActive) {
             GenerateWinScreen();
+            isActive = false;
         }
     }
 
@@ -25,14 +26,12 @@ public class WinScreen : MonoBehaviour
         GameController game = FindObjectOfType<GameController>();
 
         Player winner = null; //Player with the highest score
-        int maxScore = 0; //The highest score
 
         //Find out which player has the highest score
-        foreach (GameObject obj in game.playerObjs) {
-            Player player = obj.GetComponent<Player>();
-            if (player.score > maxScore) { //Found player with score higher than current max
+        for (int i = 0; i < game.playerObjs.Length; i++) {
+            Player player = game.playerObjs[i].GetComponent<Player>();
+            if (player.score == game.highestScore) { //Found player with highest score
                 winner = player;
-                maxScore = player.score;
             }
         }
 
@@ -43,14 +42,12 @@ public class WinScreen : MonoBehaviour
 
     //Restarts the game
     public void RestartGame() {
-        isActive = false;
         winScreen.SetActive(false);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     //Redirects to main menu
     public void LoadMenu() {
-        isActive = false;
         winScreen.SetActive(false);
         SceneManager.LoadScene("Menu");
     }
