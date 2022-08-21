@@ -12,6 +12,10 @@ public class Computer : Player
     private float stashWeight; //Heuristic for choosing the stash move
     private float spillWeight; //Heuristic for choosing the spill move
 
+    private bool isHighTrick; //Determines whether the computer should trick high or low
+
+    private readonly float TOLERANCE = 0.0001f; //The tolerance for float comparison
+
     private readonly int MAX_SUIT_SIZE = 13; //The number of cards in one suit
     private readonly int MAX_RANK_VALUE = 13; //The highest value a card can have
     private readonly float CHAIN_SPILL_THRESHOLD = 0.8f; //The threshold that determines whether computer should continue spilling
@@ -61,17 +65,16 @@ public class Computer : Player
             }
 
             //Determine move to make
-            float tolerance = 0.0001f;
-            if (Math.Abs(max - snatchWeight) <= tolerance) { //Snatch
+            if (Math.Abs(max - snatchWeight) <= TOLERANCE) { //Snatch
                 selectedMove = Move.SNATCH;
             }
-            else if (Math.Abs(max - swapWeight) <= tolerance) { //Swap
+            else if (Math.Abs(max - swapWeight) <= TOLERANCE) { //Swap
                 selectedMove = Move.SWAP;
             }
-            else if (Math.Abs(max - stashWeight) <= tolerance) { //Stash
+            else if (Math.Abs(max - stashWeight) <= TOLERANCE) { //Stash
                 selectedMove = Move.STASH;
             }
-            else if (Math.Abs(max - spillWeight) <= tolerance) { //Spill
+            else if (Math.Abs(max - spillWeight) <= TOLERANCE) { //Spill
                 selectedMove = Move.SPILL;
             }
             else { //Undefined
@@ -113,12 +116,17 @@ public class Computer : Player
                     selectedCard = hand[i];
                 } while (selectedCard.isRed != game.discard[game.discard.Count - 1].isRed);
                 break;
-            case Move.STASH: //If hand has a card higher in value than discard, choose the highest value card, else choose the lowest value card
-                if (ExistsGreater(game.discard[game.discard.Count - 1].value, hand)) {
+            case Move.STASH: //If computer can trick on high card, choose highest card, else the lowest card
+                if (isHighTrick && ExistsGreater(game.discard[game.discard.Count - 1].value, hand)) { //Found card for high trick
                     selectedCard = HighestCard(hand);
                 }
-                else {
+                else if (!isHighTrick && ExistsLesser(game.discard[game.discard.Count - 1].value, hand)) { //Found card for low trick
                     selectedCard = LowestCard(hand);
+                }
+                else { //No suitable card for trick, pick randomly
+                    System.Random rand = new System.Random();
+                    int i = rand.Next(hand.Length);
+                    selectedCard = hand[i];
                 }
                 break;
             case Move.SPILL: //Select the card with the highest value
@@ -164,15 +172,31 @@ public class Computer : Player
     private float CalculateStashWeight() {
         if (game.stash.Count == 0) { //Stash is empty, computer can place a card in the stash
             float fail = ProbabilityStashFails(game.discard[game.discard.Count - 1].value);
-            float expectedGain = 0.0f;
-            if (ExistsGreater(game.discard[game.discard.Count - 1].value, hand)) {
-                //Stash weight is the possibility of tricking opposing players that a sticky card has been stashed
-                expectedGain = ((game.discard[game.discard.Count - 1].value + 1) * fail) + (-(game.discard[game.discard.Count - 1].value + 1) * (1 - fail));
+            float trickHigh = 0.0f;
+            float trickLow = 0.0f;
+
+            //Trick high is the possibility of tricking opposing players that a sticky card has been stashed
+            if (ExistsGreater(game.discard[game.discard.Count - 1].value, hand)) { //Check if high trick is possible with current hand
+                trickHigh = ((game.discard[game.discard.Count - 1].value + 1) * fail) + (-(game.discard[game.discard.Count - 1].value + 1) * (1 - fail));
             }
-            else {
-                //Stash weight is the possibility of tricking opposing players that a non-sticky card has been stashed
-                expectedGain = (MAX_RANK_VALUE * (1 - fail)) + (-MAX_RANK_VALUE * fail);
+            else { //Not possible
+                trickHigh = Int32.MinValue;
             }
+
+            //Trick low is the possibility of tricking opposing players that a non-sticky card has been stashed
+            if (ExistsLesser(game.discard[game.discard.Count - 1].value, hand)) { //Check if low trick is possible with current hand
+                trickLow = (MAX_RANK_VALUE * (1 - fail)) + (-MAX_RANK_VALUE * fail);
+            }
+            else { //Not possible
+                trickLow = Int32.MinValue;
+            }
+            
+            //Stash weight is the trick with higher possibility of succeeding
+            float expectedGain = Math.Max(trickHigh, trickLow);
+
+            //Set trick flag
+            isHighTrick = (Math.Abs(expectedGain - trickHigh) <= TOLERANCE) ? true : false;
+
             return score + expectedGain;
         }
         else { //Stash is occupied, computer can steal from the stash

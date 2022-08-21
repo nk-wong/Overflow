@@ -108,6 +108,17 @@ public abstract class Player : MonoBehaviour
         return false;
     }
 
+    //Returns true if a card in the Card array is less than or equal to the input
+    protected bool ExistsLesser(int rank, Card[] type) {
+        for (int i = 0; i < type.Length; i++) {
+            if (!(type[i] is null) && type[i].value <= rank) { //Found card higher in value than input
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     //Returns the card with the highest value in a Card array
     protected Card HighestCard(Card[] type) {
         int index = 0;
