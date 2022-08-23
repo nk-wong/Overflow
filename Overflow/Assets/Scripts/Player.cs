@@ -194,6 +194,17 @@ public abstract class Player : MonoBehaviour
         return count;
     }
 
+    //Returns the number of cards in the player's set that are sticky
+    public int StickyCount() {
+        int count = 0;
+        for (int i = 0; i < set.Length; i++) {
+            if (!(set[i] is null) && !set[i].isFaceUp) { //Found a sticky card
+                count++;
+            }
+        }
+        return count;
+    }
+
     //Determines the player's score based on the value of the cards that have been set
     protected int CalculateScore() {
         int sum = 0;
