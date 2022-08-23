@@ -53,8 +53,8 @@ public class Computer : Player
 
             if ((SetCount() == set.Length - 1) && (max - game.highestScore) < 0) { //If computer cannot win from strongest move, take the least risky move
                 //Find out the least risky move
-                snatchWeight = (snatchWeight == Int32.MinValue) ? snatchWeight : -(snatchWeight - game.highestScore);
-                swapWeight = (swapWeight == Int32.MinValue) ? swapWeight : -(swapWeight - game.highestScore);
+                snatchWeight = (snatchWeight == Int32.MinValue) ? snatchWeight : Int32.MaxValue;
+                swapWeight = (swapWeight == Int32.MinValue) ? swapWeight : Int32.MaxValue;
                 stashWeight = -(stashWeight - game.highestScore);
                 spillWeight = -(spillWeight - game.highestScore);
 
@@ -176,7 +176,7 @@ public class Computer : Player
             float trickLow = 0.0f;
 
             trickHigh = ExistsGreater(game.discard[game.discard.Count - 1].value, hand) ? ((game.discard[game.discard.Count - 1].value + 1) * fail) + (-(game.discard[game.discard.Count - 1].value + 1) * (1 - fail)) : Int32.MinValue;
-            trickLow = ExistsLesser(game.discard[game.discard.Count - 1].value, hand) ? (((set.Length - (SetCount() + StickyCount())) * -MAX_RANK_VALUE) * (1 - fail)) + (((set.Length - (SetCount() + StickyCount())) * MAX_RANK_VALUE) * fail) : Int32.MinValue;
+            trickLow = ExistsLesser(game.discard[game.discard.Count - 1].value, hand) ? (((set.Length - (SetCount() + StickyCount())) * -MAX_RANK_VALUE) * (1 - fail)) + ((((set.Length / 2) - (SetCount() + StickyCount())) * MAX_RANK_VALUE) * fail) : Int32.MinValue;
 
             //Stash weight is the trick with higher possibility of succeeding
             float expectedGain = Math.Max(trickHigh, trickLow);
@@ -189,7 +189,7 @@ public class Computer : Player
         else { //Stash is occupied, computer can steal from the stash
             //Stash weight is the possibility of stealing a non-sticky card
             float fail = ProbabilityStashFails(game.stashValue);
-            float expectedGain = ((game.stashValue + 1) * (1 - fail)) + (((set.Length - (SetCount() + StickyCount())) * MAX_RANK_VALUE) * fail);
+            float expectedGain = ((game.stashValue + 1) * (1 - fail)) + ((((set.Length / 2) - (SetCount() + StickyCount())) * MAX_RANK_VALUE) * fail);
             return score + expectedGain;
         }
     }
