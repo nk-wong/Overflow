@@ -12,6 +12,7 @@ public class GameActionController : MonoBehaviour
     [SerializeField] private Button swapButton;
     [SerializeField] private Button stashButton;
     [SerializeField] private Button spillButton;
+    [SerializeField] private Button endButton;
 
     // Start is called before the first frame update
     void Start()
@@ -24,6 +25,7 @@ public class GameActionController : MonoBehaviour
         swapButton.interactable = false;
         stashButton.interactable = false;
         spillButton.interactable = false;
+        endButton.interactable = false;
     }
 
     //Enables buttons on the UI based on the state of the game
@@ -39,6 +41,7 @@ public class GameActionController : MonoBehaviour
         }
         else { //Player is currently chain spilling
             spillButton.interactable = true;
+            endButton.interactable = true;
         }
     }
 
@@ -51,6 +54,7 @@ public class GameActionController : MonoBehaviour
         swapButton.interactable = false;
         stashButton.interactable = false;
         spillButton.interactable = false;
+        endButton.interactable = false;
     }
 
     //Chooses snatch for player
@@ -71,6 +75,11 @@ public class GameActionController : MonoBehaviour
     //Chooses spill for player
     public void ChooseSpill() {
         this.currentPlayer.selectedMove = Move.SPILL;
+    }
+
+    //Chooses end for player
+    public void ChooseEnd() {
+        this.currentPlayer.selectedMove = Move.END;
     }
 
 
