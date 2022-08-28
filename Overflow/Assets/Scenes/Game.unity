@@ -242,7 +242,7 @@ RectTransform:
   - {fileID: 1676768719}
   - {fileID: 1714345763}
   m_Father: {fileID: 187021766}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -513,6 +513,7 @@ GameObject:
   - component: {fileID: 187021764}
   - component: {fileID: 187021763}
   - component: {fileID: 187021767}
+  - component: {fileID: 187021768}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -593,8 +594,8 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1515177749}
   - {fileID: 41746651}
+  - {fileID: 1515177749}
   m_Father: {fileID: 0}
   m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -617,6 +618,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   winScreen: {fileID: 1515177748}
   winnerLabel: {fileID: 300476165}
+--- !u!114 &187021768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 187021762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84989704a6776134a8b6775a4103c0f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  snatchButton: {fileID: 1591424903}
+  swapButton: {fileID: 1695508175}
+  stashButton: {fileID: 1676768720}
+  spillButton: {fileID: 1714345764}
 --- !u!1 &300476163
 GameObject:
   m_ObjectHideFlags: 0
@@ -2098,7 +2115,7 @@ RectTransform:
   - {fileID: 969526450}
   - {fileID: 1483185430}
   m_Father: {fileID: 187021766}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -2226,7 +2243,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1591424904}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 187021768}
+        m_TargetAssemblyTypeName: GameActionController, Assembly-CSharp
+        m_MethodName: ChooseSnatch
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1591424904
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2348,7 +2377,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1676768721}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 187021768}
+        m_TargetAssemblyTypeName: GameActionController, Assembly-CSharp
+        m_MethodName: ChooseStash
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1676768721
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2532,7 +2573,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1695508176}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 187021768}
+        m_TargetAssemblyTypeName: GameActionController, Assembly-CSharp
+        m_MethodName: ChooseSwap
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1695508176
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2654,7 +2707,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1714345765}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 187021768}
+        m_TargetAssemblyTypeName: GameActionController, Assembly-CSharp
+        m_MethodName: ChooseSpill
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1714345765
 MonoBehaviour:
   m_ObjectHideFlags: 0

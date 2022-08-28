@@ -65,7 +65,7 @@ public abstract class Player : MonoBehaviour
     }
 
     //Returns true if a card in the Card array matches in suit with the input
-    protected bool Exists(string suit, Card[] type) {
+    public bool Exists(string suit, Card[] type) {
         for (int i = 0; i < type.Length; i++) {
             if (!(type[i] is null) && suit == type[i].suit) { //Found card that matches in suit
                 return true;
@@ -76,7 +76,7 @@ public abstract class Player : MonoBehaviour
     }
 
     //Returns true if a card in the Card array matches in rank with the input
-    protected bool Exists(int rank, Card[] type) {
+    public bool Exists(int rank, Card[] type) {
         for (int i = 0; i < type.Length; i++) {
             if (!(type[i] is null) && rank == type[i].value) { //Found card that matches in rank
                 return true;
@@ -87,7 +87,7 @@ public abstract class Player : MonoBehaviour
     }
 
     //Returns true if a card in the Card array matches in color with the input
-    protected bool Exists(bool color, Card[] type) {
+    public bool Exists(bool color, Card[] type) {
         for (int i = 0; i < type.Length; i++) {
             if (!(type[i] is null) && type[i].isRed == color) { //Found card that matches in color
                 return true;
