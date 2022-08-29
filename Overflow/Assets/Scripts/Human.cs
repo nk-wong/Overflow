@@ -45,7 +45,6 @@ public class Human : Player
             }
         }
         
-
         //Player selects a card
         yield return ChooseCard();
         
