@@ -44,12 +44,10 @@ public class Human : Player
                 yield return null;
             }
         }
-        Debug.Log(this.name + " has decided to " + selectedMove);
+        
 
         //Player selects a card
-        if (selectedMove != Move.END && (selectedMove != Move.STASH || game.stash.Count == 0)) { //Player only chooses a card when not ending turn or stealing
-            yield return ChooseCard();
-        }
+        yield return ChooseCard();
         
         //Player performs the move
         yield return MakeMove();
@@ -64,7 +62,12 @@ public class Human : Player
         select = true;
         //Wait until the selected card matches the rules of the move
         while (!IsValidSelection(selectedMove, selectedCard)) {
-            yield return null;
+            if (selectedMove != Move.END && (selectedMove != Move.STASH || game.stash.Count == 0)) { //Player only chooses a card when not ending turn or stealing
+                yield return null;
+            }
+            else {
+                break;
+            }
         }
         //Card has been selected, disable the player's ability to select another card
         select = false;

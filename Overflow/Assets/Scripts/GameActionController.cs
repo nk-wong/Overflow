@@ -60,26 +60,31 @@ public class GameActionController : MonoBehaviour
     //Chooses snatch for player
     public void ChooseSnatch() {
         this.currentPlayer.selectedMove = Move.SNATCH;
+        Debug.Log(this.name + " has decided to SNATCH");
     }
 
     //Chooses swap for player
     public void ChooseSwap() {
         this.currentPlayer.selectedMove = Move.SWAP;
+        Debug.Log(this.name + " has decided to SWAP");
     }
 
     //Chooses stash for player
     public void ChooseStash() {
         this.currentPlayer.selectedMove = Move.STASH;
+        Debug.Log(this.name + " has decided to STASH");
     }
 
     //Chooses spill for player
     public void ChooseSpill() {
         this.currentPlayer.selectedMove = Move.SPILL;
+        Debug.Log(this.name + " has decided to SPILL");
     }
 
     //Chooses end for player
     public void ChooseEnd() {
         this.currentPlayer.selectedMove = Move.END;
+        Debug.Log(this.name + " has decided to END");
     }
 
 
