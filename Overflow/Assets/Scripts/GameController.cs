@@ -20,6 +20,7 @@ public class GameController : MonoBehaviour {
     //Fields to help build the card game objects
     public GameObject cardPrefab; //Template to build cards
     public Sprite[] cardFaces; //Holds the image for each card in the deck
+    public GameObject scoreLabelPrefab; //Template to build score labels for scoreboard
 
     //Fields to help position cards
     public GameObject deckObj; //The game object representing the deck pile
@@ -36,7 +37,7 @@ public class GameController : MonoBehaviour {
     void Start()
     {
         //Initialize other controllers
-        LabelController.Initialize();
+        LabelController.Initialize(this.playerObjs, scoreLabelPrefab);
 
         PlayCards(); //Create and shuffle deck
     }
