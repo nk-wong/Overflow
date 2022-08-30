@@ -43,11 +43,22 @@ public class LabelController : MonoBehaviour
     }
 
     //Changes the labels based on the stash value and stash player
-    public static void ChangeLabels(int stashValue, Player stashPlayer) {
+    public static void ChangeStashLabels(int stashValue, Player stashPlayer) {
         //If a card has been stashed, change stash value label to top of discard value, else change to default
         stashValueLabel.text = (stashValue != 0) ? "Stash Value: " + stashValue : "Stash Value: ";
 
         //If a card has been stashed, change stash player label to player who stashed, else change to default
         stashPlayerLabel.text = (!(stashPlayer is null)) ? "Stash Player: " + stashPlayer.name : "Stash Player: ";
+    }
+
+    //Changes the score label at the index to the new score
+    public static void ChangeScoreLabels(int index, int newScore) {
+        if (!(index >= scores.Count)) { //Index corresponds to label in scores list
+            //Make change to label
+            scores[index].text = "Player" + (index + 1) + ": " + newScore;
+        }
+        else { //Error
+            Debug.Log("Could not sync " + index + " to an element in the scores list");
+        }
     }
 }

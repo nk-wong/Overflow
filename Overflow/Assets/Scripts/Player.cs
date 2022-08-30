@@ -168,8 +168,8 @@ public abstract class Player : MonoBehaviour
             Debug.Log(this.name + " does not have space in its set to add the card(" + card.rank + card.suit + ")");
         }
 
-        //If the final card added to a set is sticky, player loses all their points
-        score = (card.isFaceUp == false && SetCount() == set.Length) ? 0 : CalculateScore();
+        //Calculate score
+        score = CalculateScore();
         Debug.Log(this.name + " score is " + score);
 
         //Use the index to find the GameObject
@@ -181,6 +181,9 @@ public abstract class Player : MonoBehaviour
         if (!Remove(card, set)) { //Could not find the card, output error
             Debug.Log(this.name + " cannot remove the card(" + card.rank + card.suit + ") because it does not exist in the set");
         }
+
+        //Update score
+        score = CalculateScore();
     }
 
     //Returns the number of cards that have been set by the player
