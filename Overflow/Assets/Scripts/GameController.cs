@@ -20,6 +20,7 @@ public class GameController : MonoBehaviour {
     //Fields to help build the card game objects
     public GameObject cardPrefab; //Template to build cards
     public Sprite[] cardFaces; //Holds the image for each card in the deck
+    public GameObject scoreLabelPrefab; //Template to build score labels for scoreboard
 
     //Fields to help position cards
     public GameObject deckObj; //The game object representing the deck pile
@@ -35,6 +36,9 @@ public class GameController : MonoBehaviour {
     // Start is called before the first frame update
     void Start()
     {
+        //Initialize other controllers
+        LabelController.Initialize(this.playerObjs, scoreLabelPrefab);
+
         PlayCards(); //Create and shuffle deck
     }
 
@@ -134,7 +138,9 @@ public class GameController : MonoBehaviour {
 
             //Card management
             yield return ResolveStashPile(player);
+            LabelController.ChangeScoreLabels((int)index%NUM_PLAYERS, player.score);
             yield return player.Play();
+            LabelController.ChangeScoreLabels((int)index%NUM_PLAYERS, player.score);
             
             //Pile management
             yield return ReshuffleDeck();
@@ -325,9 +331,10 @@ public class GameController : MonoBehaviour {
             player.RemoveFromHand(handCard);
             yield return MoveToStash(handCard);
 
-            //Set the stash value and player
+            //Set the stash value and player and notify label controller
             stashValue = discard[discard.Count - 1].value;
             stashPlayer = player;
+            LabelController.ChangeStashLabels(stashValue, stashPlayer);
 
             //Move the card on the top of the deck to the player's hand
             Card gain = deck[deck.Count - 1];
@@ -343,9 +350,10 @@ public class GameController : MonoBehaviour {
             //Determine if stashed card will be a sticky card
             stashedCard.isFaceUp = stashedCard.value > stashValue ? true : false;
 
-            //Reset the stash value and player
+            //Reset the stash value and player and notify label controller
             stashValue = 0;
             stashPlayer = null;
+            LabelController.ChangeStashLabels(stashValue, stashPlayer);
 
             //Move the stashed card from the stash pile to the player's set
             GameObject obj = player.AddToSet(stashedCard);
