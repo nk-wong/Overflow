@@ -515,6 +515,7 @@ GameObject:
   - component: {fileID: 187021763}
   - component: {fileID: 187021767}
   - component: {fileID: 187021768}
+  - component: {fileID: 187021769}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -637,6 +638,18 @@ MonoBehaviour:
   stashButton: {fileID: 1676768720}
   spillButton: {fileID: 1714345764}
   endButton: {fileID: 1282316375}
+--- !u!114 &187021769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 187021762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c5537451d59f9749a55b28ea1dcdd9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &251388207
 GameObject:
   m_ObjectHideFlags: 0
@@ -653,7 +666,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!224 &251388208
 RectTransform:
@@ -1785,7 +1798,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!224 &1197215461
 RectTransform:
