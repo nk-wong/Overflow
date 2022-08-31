@@ -307,8 +307,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1860896204}
   m_HandleRect: {fileID: 1860896203}
   m_Direction: 2
-  m_Value: 1.000001
-  m_Size: 0.6770785
+  m_Value: 1.0000002
+  m_Size: 0.34413376
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -532,8 +532,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 959.99994, y: -797.5447}
-  m_SizeDelta: {x: 1920, y: 1595.0885}
+  m_AnchoredPosition: {x: 950.00006, y: -1569.1576}
+  m_SizeDelta: {x: 1900, y: 3138.3145}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &779002472
 MonoBehaviour:
@@ -555,10 +555,35 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '<align="center"><b><size=100>Rules</size></b></align>
-
-
-'
+  m_text: "<align=\"center\"><b><size=100><color=#00ffffff>Rules</color></size></b></align>\n\n<size=50>\n<color=#00ffffff>Win
+    Condition:</color> Acheive the highest score\n\n<color=#00ffffff>End Condition:</color>
+    The game ends when a player has set 5 cards\n\n<color=#00ffffff>Cards:</color>
+    \n\t- All numbered cards have values equivalent to the rank shown on the card\n\t-
+    The A, J, Q, and K have values 1, 11, 12, and 13 respectively\n\n<color=#00ffffff>Set
+    Cards:</color> \n\t- A card that is located in the player\u2019s set and gives
+    points to the player\n\t- Face up set cards are worth the value of the card that
+    is set\n\t- Face down set cards are worth 0 points\n\t- If the 5th set card is
+    a face down card, player must remove all face up set\n\t  cards\n\t- Game cannot
+    end on a face down set card\n\n<color=#00ffffff>Turns:</color>\n\t- On a player\u2019s
+    turn, the player can decide to perform one of following actions:\n\t\t- Snatch\n\t\t-
+    Swap\n\t\t- Stash/Steal\n\t\t- Spill\n\n<color=#00ffffff>Snatch:</color>\n\tThe
+    player discards a card form their hand that matches in rank with the top of the
+    discard and draws a new card from the deck\n\n<color=#00ffffff>Swap:</color>\n\tThe
+    player swaps a card that matches in color with the card that is 3rd from the
+    top in the deck. The swapped card must match in color with the top of the discard.\n\n<color=#00ffffff>Stash:</color>\n\tThe
+    player places a card from their hand face down in the stash pile and draws a
+    new card from the deck. A stash value is set equal to the value of the top of
+    the discard. If the stashed card is not stolen until the player's next turn.
+    The player must set the card. The card is set face up if the value of the stashed
+    card is greater than the stash value, else the card is set face down.\n\n<color=#00ffffff>Steal:</color>\n\tThe
+    player takes the card currently occupying the stash pile. If the stashed card's
+    value is greater than the stash value, the player can set the card face up, else
+    the card is set face down.\n\n<color=#00ffffff>Spill:</color>\n\tThe player flips
+    3 cards from the deck onto the spill pile. If any of the 3 cards matches in suit
+    with the top of the discard, the spill ends, and the player loses all their set
+    cards. If none match in suit, the player can set a card from their hand face
+    up. If the player was able to set a card, the player can choose to spill again.
+    At the end of a spill, the cards in the spill pile are moved to the discard.\n\n</size>"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
