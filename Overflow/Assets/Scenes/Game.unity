@@ -242,7 +242,6 @@ RectTransform:
   - {fileID: 1676768719}
   - {fileID: 1714345763}
   - {fileID: 1282316374}
-  - {fileID: 189959865}
   m_Father: {fileID: 187021766}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -693,8 +692,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 187021767}
-        m_TargetAssemblyTypeName: WinScreen, Assembly-CSharp
+      - m_Target: {fileID: 187021770}
+        m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
         m_MethodName: QuitGame
         m_Mode: 1
         m_Arguments:
@@ -758,6 +757,7 @@ GameObject:
   - component: {fileID: 187021767}
   - component: {fileID: 187021768}
   - component: {fileID: 187021769}
+  - component: {fileID: 187021770}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -840,6 +840,7 @@ RectTransform:
   m_Children:
   - {fileID: 347668727}
   - {fileID: 41746651}
+  - {fileID: 189959865}
   - {fileID: 1515177749}
   - {fileID: 1629978876}
   m_Father: {fileID: 0}
@@ -886,6 +887,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c5537451d59f9749a55b28ea1dcdd9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &187021770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 187021762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25ac22ce58f9d2d4db3ccb63bc538e76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pauseMenu: {fileID: 1629978875}
 --- !u!1 &189959864
 GameObject:
   m_ObjectHideFlags: 0
@@ -917,8 +931,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 41746651}
-  m_RootOrder: 5
+  m_Father: {fileID: 187021766}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
@@ -1006,7 +1020,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 189959866}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 187021770}
+        m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
+        m_MethodName: PauseGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &251388207
 GameObject:
   m_ObjectHideFlags: 0
@@ -3555,7 +3581,7 @@ RectTransform:
   m_Children:
   - {fileID: 1253673616}
   m_Father: {fileID: 187021766}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -3766,7 +3792,7 @@ RectTransform:
   m_Children:
   - {fileID: 68928398}
   m_Father: {fileID: 187021766}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -4801,9 +4827,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 187021767}
-        m_TargetAssemblyTypeName: WinScreen, Assembly-CSharp
-        m_MethodName: RestartGame
+      - m_Target: {fileID: 187021770}
+        m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
+        m_MethodName: ResumeGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4935,8 +4961,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 187021767}
-        m_TargetAssemblyTypeName: WinScreen, Assembly-CSharp
+      - m_Target: {fileID: 187021770}
+        m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
         m_MethodName: LoadMenu
         m_Mode: 1
         m_Arguments:
