@@ -37,6 +37,7 @@ public class GameController : MonoBehaviour {
     void Start()
     {
         //Initialize other controllers
+        GameActionController.Initialize();
         LabelController.Initialize(this.playerObjs, scoreLabelPrefab);
 
         PlayCards(); //Create and shuffle deck

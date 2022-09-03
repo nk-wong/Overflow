@@ -5,20 +5,22 @@ using UnityEngine.UI;
 
 public class GameActionController : MonoBehaviour
 {
-    private GameController game; //Connect to current game session
-    private Player currentPlayer; //The player currently using the action controller
+    private static Player currentPlayer; //The player currently using the action controller
 
-    [SerializeField] private Button snatchButton;
-    [SerializeField] private Button swapButton;
-    [SerializeField] private Button stashButton;
-    [SerializeField] private Button spillButton;
-    [SerializeField] private Button endButton;
+    private static Button snatchButton;
+    private static Button swapButton;
+    private static Button stashButton;
+    private static Button spillButton;
+    private static Button endButton;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        //Find game session
-        game = FindObjectOfType<GameController>();
+    //Initialize all user input objects in the game
+    public static void Initialize() {
+        //Initialize buttons
+        snatchButton = GameObject.Find("SnatchButton").GetComponent<Button>();
+        swapButton = GameObject.Find("SwapButton").GetComponent<Button>();
+        stashButton = GameObject.Find("StashButton").GetComponent<Button>();
+        spillButton = GameObject.Find("SpillButton").GetComponent<Button>();
+        endButton = GameObject.Find("EndButton").GetComponent<Button>();
 
         //Make all buttons disabled at the start of the game
         snatchButton.interactable = false;
@@ -29,9 +31,12 @@ public class GameActionController : MonoBehaviour
     }
 
     //Enables buttons on the UI based on the state of the game
-    public void EnableInput(Player player) {
+    public static void EnableInput(Player player) {
+        //Observe the game state
+        GameController game = FindObjectOfType<GameController>();
+
         //Enable input for player
-        this.currentPlayer = player;
+        currentPlayer = player;
 
         if (player.selectedMove != Move.SPILL || game.spill.Count == 0) { //Player can choose from all moves if not chain spilling
             snatchButton.interactable = player.Exists(game.discard[game.discard.Count - 1].value, player.hand) ? true : false;
@@ -46,9 +51,9 @@ public class GameActionController : MonoBehaviour
     }
 
     //Disables all buttons on the UI
-    public void DisableInput() {
+    public static void DisableInput() {
         //Disable input for player
-        this.currentPlayer = null;
+        currentPlayer = null;
 
         snatchButton.interactable = false;
         swapButton.interactable = false;
@@ -59,31 +64,31 @@ public class GameActionController : MonoBehaviour
 
     //Chooses snatch for player
     public void ChooseSnatch() {
-        this.currentPlayer.selectedMove = Move.SNATCH;
+        currentPlayer.selectedMove = Move.SNATCH;
         Debug.Log(currentPlayer.name + " has decided to SNATCH");
     }
 
     //Chooses swap for player
     public void ChooseSwap() {
-        this.currentPlayer.selectedMove = Move.SWAP;
+        currentPlayer.selectedMove = Move.SWAP;
         Debug.Log(currentPlayer.name + " has decided to SWAP");
     }
 
     //Chooses stash for player
     public void ChooseStash() {
-        this.currentPlayer.selectedMove = Move.STASH;
+        currentPlayer.selectedMove = Move.STASH;
         Debug.Log(currentPlayer.name + " has decided to STASH");
     }
 
     //Chooses spill for player
     public void ChooseSpill() {
-        this.currentPlayer.selectedMove = Move.SPILL;
+        currentPlayer.selectedMove = Move.SPILL;
         Debug.Log(currentPlayer.name + " has decided to SPILL");
     }
 
     //Chooses end for player
     public void ChooseEnd() {
-        this.currentPlayer.selectedMove = Move.END;
+        currentPlayer.selectedMove = Move.END;
         Debug.Log(currentPlayer.name + " has decided to END");
     }
 
