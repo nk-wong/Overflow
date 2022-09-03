@@ -6,22 +6,22 @@ using TMPro;
 
 public class WinScreen : MonoBehaviour
 {
-    public static bool isActive; //Indicates whether the win screen should be visible
 
-    public GameObject winScreen; //The game object panel with UI
-    public TextMeshProUGUI winnerLabel; //The label game object that shows which player won the game
+    private static GameObject winScreen; //The game object panel with UI
+    private static TextMeshProUGUI winnerLabel; //The label game object that shows which player won the game
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (isActive) {
-            GenerateWinScreen();
-            isActive = false;
-        }
+    //Initialize GUI for the win screen
+    public static void Initialize() {
+        //Initialize the win screen panel and win screen label
+        winScreen = GameObject.Find("WinScreen");
+        winnerLabel = GameObject.Find("WinnerLabel").GetComponent<TextMeshProUGUI>();
+
+        //Make win screen hidden and disabled at the start of the game
+        winScreen.SetActive(false);
     }
 
     //Create the win screen
-    public void GenerateWinScreen() {
+    public static void GenerateWinScreen() {
         //Observe the game
         GameController game = FindObjectOfType<GameController>();
 
@@ -42,13 +42,11 @@ public class WinScreen : MonoBehaviour
 
     //Restarts the game
     public void RestartGame() {
-        winScreen.SetActive(false);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     //Redirects to main menu
     public void LoadMenu() {
-        winScreen.SetActive(false);
         SceneManager.LoadScene("Menu");
     }
 

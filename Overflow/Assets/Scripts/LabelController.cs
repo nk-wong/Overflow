@@ -35,7 +35,7 @@ public class LabelController : MonoBehaviour
             label.text = "Player" + (i + 1) + ": 0";
 
             //Add label to scoreboard
-            newLabel.transform.parent = scoreboard.transform;
+            newLabel.transform.SetParent(scoreboard.transform, false);
 
             //Add label to scores list
             scores.Add(label);

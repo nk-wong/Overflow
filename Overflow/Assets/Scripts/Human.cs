@@ -26,11 +26,8 @@ public class Human : Player
         selectedMove = (selectedMove == Move.SPILL) ? Move.SPILL : Move.UNDEFINED;
         selectedCard = null;
 
-        //Take control of GameActionController
-        GameActionController gac = FindObjectOfType<GameActionController>();
-
         //Determine which moves the player can make
-        gac.EnableInput(this);
+        GameActionController.EnableInput(this);
 
         if (selectedMove != Move.SPILL || game.spill.Count == 0) {
             selectedMove = Move.UNDEFINED;
@@ -52,7 +49,7 @@ public class Human : Player
         yield return MakeMove();
 
         //Player's turn has ended
-        gac.DisableInput();
+        GameActionController.DisableInput();
     }
 
     //Chooses the card that the player will play on the turn

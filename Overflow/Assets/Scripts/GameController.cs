@@ -37,7 +37,9 @@ public class GameController : MonoBehaviour {
     void Start()
     {
         //Initialize other controllers
+        GameActionController.Initialize();
         LabelController.Initialize(this.playerObjs, scoreLabelPrefab);
+        WinScreen.Initialize();
 
         PlayCards(); //Create and shuffle deck
     }
@@ -154,7 +156,7 @@ public class GameController : MonoBehaviour {
                 index++;
             }
         }
-        WinScreen.isActive = true;
+        WinScreen.GenerateWinScreen();
     }
 
     //Finds the highest score amongst all players
