@@ -619,8 +619,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 173593d97fa1de349a3c2cb15ac46e4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  winScreen: {fileID: 1515177748}
-  winnerLabel: {fileID: 300476165}
 --- !u!114 &187021768
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -633,11 +631,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84989704a6776134a8b6775a4103c0f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  snatchButton: {fileID: 1591424903}
-  swapButton: {fileID: 1695508175}
-  stashButton: {fileID: 1676768720}
-  spillButton: {fileID: 1714345764}
-  endButton: {fileID: 1282316375}
 --- !u!114 &187021769
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2597,7 +2590,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1515177749
 RectTransform:
   m_ObjectHideFlags: 0
