@@ -141,8 +141,10 @@ public class GameController : MonoBehaviour {
             //Card management
             yield return ResolveStashPile(player);
             LabelController.ChangeScoreLabels((int)index%NUM_PLAYERS, player.score);
-            yield return player.Play();
-            LabelController.ChangeScoreLabels((int)index%NUM_PLAYERS, player.score);
+            if (!DetermineWin(player)) { //Player does not need to go if game was won by resolved stash
+                yield return player.Play();
+                LabelController.ChangeScoreLabels((int)index%NUM_PLAYERS, player.score);
+            }
             
             //Pile management
             yield return ReshuffleDeck();
