@@ -2,9 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using TMPro;
 
 public class ButtonBehavior : MonoBehaviour
 {
+    private Button button;
+    private Color normalTextColor;
+    [SerializeField] private Color highlighedTextColor;
 
     public void PlayGame() {
         SceneManager.LoadScene("Game");
@@ -22,4 +27,14 @@ public class ButtonBehavior : MonoBehaviour
         Application.Quit();
     }
   
+    public void OnPointerEnter(string buttonName) {
+        button = GameObject.Find(buttonName).GetComponent<Button>();
+        normalTextColor = button.GetComponentInChildren<TextMeshProUGUI>().color;
+
+        button.GetComponentInChildren<TextMeshProUGUI>().color = highlighedTextColor;
+    }
+
+    public void OnPointerExit() {
+        button.GetComponentInChildren<TextMeshProUGUI>().color = normalTextColor;
+    }
 }
