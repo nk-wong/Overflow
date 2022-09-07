@@ -338,7 +338,7 @@ public class GameController : MonoBehaviour {
             //Set the stash value and player and notify label controller
             stashValue = discard[discard.Count - 1].value;
             stashPlayer = player;
-            LabelController.ChangeStashLabels(stashValue, stashPlayer);
+            LabelController.ChangeStashLabel(stashValue, stashPlayer);
 
             //Move the card on the top of the deck to the player's hand
             Card gain = deck[deck.Count - 1];
@@ -357,7 +357,7 @@ public class GameController : MonoBehaviour {
             //Reset the stash value and player and notify label controller
             stashValue = 0;
             stashPlayer = null;
-            LabelController.ChangeStashLabels(stashValue, stashPlayer);
+            LabelController.ChangeStashLabel(stashValue, stashPlayer);
 
             //Move the stashed card from the stash pile to the player's set
             GameObject obj = player.AddToSet(stashedCard);

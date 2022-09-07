@@ -6,17 +6,15 @@ using TMPro;
 public class LabelController : MonoBehaviour
 {
 
-    private static TextMeshProUGUI stashValueLabel; //The label game object that shows what value a card was stashed on
-    private static TextMeshProUGUI stashPlayerLabel; //The label game object that shows which player stashed
+    private static TextMeshProUGUI stashInfoLabel; //The label game object that shows which player stashed and on what value
 
     private static GameObject scoreboard; //The game object that holds the score labels for each player
     private static List<TextMeshProUGUI> scores; //Holds the score labels that were added to the scoreboard
 
     //Initializes all labels in the UI
     public static void Initialize(GameObject[] players, GameObject scoreLabelPrefab) {
-        //Initialize stash labels
-        stashValueLabel = GameObject.Find("StashValueLabel").GetComponent<TextMeshProUGUI>();
-        stashPlayerLabel = GameObject.Find("StashPlayerLabel").GetComponent<TextMeshProUGUI>();
+        //Initialize stash label
+        stashInfoLabel = GameObject.Find("StashInfoLabel").GetComponent<TextMeshProUGUI>();
 
         //Initialize scoreboard
         scoreboard = GameObject.Find("Scoreboard");
@@ -42,13 +40,14 @@ public class LabelController : MonoBehaviour
         }
     }
 
-    //Changes the labels based on the stash value and stash player
-    public static void ChangeStashLabels(int stashValue, Player stashPlayer) {
-        //If a card has been stashed, change stash value label to top of discard value, else change to default
-        stashValueLabel.text = (stashValue != 0) ? "Stash Value: " + stashValue : "Stash Value: ";
-
-        //If a card has been stashed, change stash player label to player who stashed, else change to default
-        stashPlayerLabel.text = (!(stashPlayer is null)) ? "Stash Player: " + stashPlayer.name : "Stash Player: ";
+    //Changes the label based on the stash value and stash player
+    public static void ChangeStashLabel(int stashValue, Player stashPlayer) {
+        if (stashValue != 0 && !(stashPlayer is null)) { //If a card has been stashed, change stash info label to show stash value and player
+            stashInfoLabel.text = "stash: " + stashPlayer.name + " stashed on " + stashValue;
+        }
+        else { //Else change to default
+            stashInfoLabel.text = "stash: ";
+        }
     }
 
     //Changes the score label at the index to the new score
