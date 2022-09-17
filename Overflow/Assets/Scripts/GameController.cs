@@ -229,6 +229,8 @@ public class GameController : MonoBehaviour {
         AlignPile(discard, discardObj); //Make sure the discard is showing the correct top card
         AlignPile(stash, stashObj); //Make sure the stash is the showing the correct top card
         AlignPile(spill, spillObj); //Make sure the spill is showing the correct top card
+
+        LabelController.UpdateDeckPileCounter(deck.Count);
     }
 
     private IEnumerator MoveCard(Card card, GameObject newPos, List<Card> newDeck) {

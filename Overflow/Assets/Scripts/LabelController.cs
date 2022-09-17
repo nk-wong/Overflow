@@ -11,6 +11,11 @@ public class LabelController : MonoBehaviour
     private static GameObject scoreboard; //The game object that holds the score labels for each player
     private static List<TextMeshProUGUI> scores; //Holds the score labels that were added to the scoreboard
 
+    private static GameObject deckPile; //UI object representing the deck
+    private static GameObject discardPile; //UI object representing the discard
+    private static GameObject spillPile; //UI object representing the spill
+    private static GameObject stashPile; //UI object representing the stash
+
     //Initializes all labels in the UI
     public static void Initialize(GameObject[] players, GameObject scoreLabelPrefab) {
         //Initialize stash label
@@ -38,6 +43,15 @@ public class LabelController : MonoBehaviour
             //Add label to scores list
             scores.Add(label);
         }
+
+        //Initialize pile counter label
+        deckPile = GameObject.Find("DeckPile");
+        discardPile = GameObject.Find("DiscardPile");
+        spillPile = GameObject.Find("SpillPile");
+        stashPile = GameObject.Find("StashPile");
+
+        //Set the deck count
+        UpdateDeckPileCounter(52);
     }
 
     //Changes the label based on the stash value and stash player
@@ -59,5 +73,10 @@ public class LabelController : MonoBehaviour
         else { //Error
             Debug.Log("Could not sync " + index + " to an element in the scores list");
         }
+    }
+
+    public static void UpdateDeckPileCounter(int count) {
+        TextMeshProUGUI counter = deckPile.transform.Find("Counter").GetComponentInChildren<TextMeshProUGUI>();
+        counter.text = count.ToString();
     }
 }
