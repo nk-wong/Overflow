@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class GameActionController : MonoBehaviour
 {
@@ -13,6 +14,9 @@ public class GameActionController : MonoBehaviour
     private static Button spillButton;
     private static Button endButton;
 
+    private static Color defaultColor;
+    [SerializeField] private Color selectedColor;
+
     //Initialize all user input objects in the game
     public static void Initialize() {
         //Initialize buttons
@@ -21,6 +25,8 @@ public class GameActionController : MonoBehaviour
         stashButton = GameObject.Find("StashButton").GetComponent<Button>();
         spillButton = GameObject.Find("SpillButton").GetComponent<Button>();
         endButton = GameObject.Find("EndButton").GetComponent<Button>();
+
+        defaultColor = endButton.GetComponentInChildren<TextMeshProUGUI>().color;
 
         //Make all buttons disabled at the start of the game
         snatchButton.interactable = false;
@@ -55,6 +61,9 @@ public class GameActionController : MonoBehaviour
         //Disable input for player
         currentPlayer = null;
 
+        //Ensure all button text is set back to default
+        DeselectButtons();
+
         snatchButton.interactable = false;
         swapButton.interactable = false;
         stashButton.interactable = false;
@@ -66,30 +75,53 @@ public class GameActionController : MonoBehaviour
     public void ChooseSnatch() {
         currentPlayer.selectedMove = Move.SNATCH;
         Debug.Log(currentPlayer.name + " has decided to SNATCH");
+
+        DeselectButtons();
+        snatchButton.GetComponentInChildren<TextMeshProUGUI>().color = selectedColor;
     }
 
     //Chooses swap for player
     public void ChooseSwap() {
         currentPlayer.selectedMove = Move.SWAP;
         Debug.Log(currentPlayer.name + " has decided to SWAP");
+
+        DeselectButtons();
+        swapButton.GetComponentInChildren<TextMeshProUGUI>().color = selectedColor;
     }
 
     //Chooses stash for player
     public void ChooseStash() {
         currentPlayer.selectedMove = Move.STASH;
         Debug.Log(currentPlayer.name + " has decided to STASH");
+
+        DeselectButtons();
+        stashButton.GetComponentInChildren<TextMeshProUGUI>().color = selectedColor;
     }
 
     //Chooses spill for player
     public void ChooseSpill() {
         currentPlayer.selectedMove = Move.SPILL;
         Debug.Log(currentPlayer.name + " has decided to SPILL");
+
+        DeselectButtons();
+        spillButton.GetComponentInChildren<TextMeshProUGUI>().color = selectedColor;
     }
 
     //Chooses end for player
     public void ChooseEnd() {
         currentPlayer.selectedMove = Move.END;
         Debug.Log(currentPlayer.name + " has decided to END");
+
+        DeselectButtons();
+        endButton.GetComponentInChildren<TextMeshProUGUI>().color = selectedColor;
+    }
+
+    private static void DeselectButtons() {
+        snatchButton.GetComponentInChildren<TextMeshProUGUI>().color = defaultColor;
+        swapButton.GetComponentInChildren<TextMeshProUGUI>().color = defaultColor;
+        stashButton.GetComponentInChildren<TextMeshProUGUI>().color = defaultColor;
+        spillButton.GetComponentInChildren<TextMeshProUGUI>().color = defaultColor;
+        endButton.GetComponentInChildren<TextMeshProUGUI>().color = defaultColor;
     }
 
 }
