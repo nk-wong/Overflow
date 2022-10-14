@@ -137,6 +137,7 @@ public class GameController : MonoBehaviour {
         while (!isGameOver) {
             //Get player for turn
             Player player = playerObjs[index%NUM_PLAYERS].GetComponent<Player>();
+            LabelController.HighlightCurrentPlayer((int)index%NUM_PLAYERS);
 
             //Card management
             yield return ResolveStashPile(player);
@@ -155,6 +156,7 @@ public class GameController : MonoBehaviour {
 
             //Move on to the next player if a spill was not performed by the current player or the spill failed
             if (player.selectedMove != Move.SPILL || spill.Count == 0) {
+                LabelController.UnhighlightCurrentPlayer((int)index%NUM_PLAYERS);
                 index++;
             }
         }

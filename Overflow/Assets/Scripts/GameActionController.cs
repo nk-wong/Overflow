@@ -14,8 +14,8 @@ public class GameActionController : MonoBehaviour
     private static Button spillButton;
     private static Button endButton;
 
-    private static Color defaultColor;
-    [SerializeField] private Color selectedColor;
+    private static Color defaultColor = new Color32(17, 0, 103, 255);
+    private static Color selectedColor = new Color32(255, 255, 255, 255);
 
     //Initialize all user input objects in the game
     public static void Initialize() {
@@ -25,8 +25,6 @@ public class GameActionController : MonoBehaviour
         stashButton = GameObject.Find("StashButton").GetComponent<Button>();
         spillButton = GameObject.Find("SpillButton").GetComponent<Button>();
         endButton = GameObject.Find("EndButton").GetComponent<Button>();
-
-        defaultColor = endButton.GetComponentInChildren<TextMeshProUGUI>().color;
 
         //Make all buttons disabled at the start of the game
         snatchButton.interactable = false;
@@ -116,6 +114,7 @@ public class GameActionController : MonoBehaviour
         endButton.GetComponentInChildren<TextMeshProUGUI>().color = selectedColor;
     }
 
+    //Makes all button text the default text color
     private static void DeselectButtons() {
         snatchButton.GetComponentInChildren<TextMeshProUGUI>().color = defaultColor;
         swapButton.GetComponentInChildren<TextMeshProUGUI>().color = defaultColor;

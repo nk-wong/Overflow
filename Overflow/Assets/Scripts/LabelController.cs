@@ -16,6 +16,9 @@ public class LabelController : MonoBehaviour
     private static GameObject spillPile; //UI object representing the spill
     private static GameObject stashPile; //UI object representing the stash
 
+    private static Color defaultColor = new Color32(188, 93, 97, 255);
+    private static Color highlightColor = new Color32(108, 202, 94, 255);
+
     //Initializes all labels in the UI
     public static void Initialize(GameObject[] players, GameObject scoreLabelPrefab) {
         //Initialize stash label
@@ -61,6 +64,28 @@ public class LabelController : MonoBehaviour
         }
         else { //Else change to default
             stashInfoLabel.text = "stash: ";
+        }
+    }
+
+    //Indicates the current playing player on the scoreboard
+    public static void HighlightCurrentPlayer(int index) {
+        if (!(index >= scores.Count)) { //Index corresponds to label in score list
+            //Highlight player
+            scores[index].color = highlightColor;
+        }
+        else { //Error
+            Debug.Log("Could not sync " + index + " to an element in the scores list");
+        }
+    }
+
+    //Returns a score label to its original text color
+    public static void UnhighlightCurrentPlayer(int index) {
+        if (!(index >= scores.Count)) { //Index corresponds to label in score list
+            //Unhighlight player
+            scores[index].color = defaultColor;
+        }
+        else { //Error
+            Debug.Log("Could not sync " + index + " to an element in the scores list");
         }
     }
 
