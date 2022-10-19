@@ -6,17 +6,23 @@ using TMPro;
 public class LabelController : MonoBehaviour
 {
 
-    private static TextMeshProUGUI stashValueLabel; //The label game object that shows what value a card was stashed on
-    private static TextMeshProUGUI stashPlayerLabel; //The label game object that shows which player stashed
+    private static TextMeshProUGUI stashInfoLabel; //The label game object that shows which player stashed and on what value
 
     private static GameObject scoreboard; //The game object that holds the score labels for each player
     private static List<TextMeshProUGUI> scores; //Holds the score labels that were added to the scoreboard
 
+    private static GameObject deckPile; //UI object representing the deck
+    private static GameObject discardPile; //UI object representing the discard
+    private static GameObject spillPile; //UI object representing the spill
+    private static GameObject stashPile; //UI object representing the stash
+
+    private static Color defaultColor = new Color32(188, 93, 97, 255);
+    private static Color highlightColor = new Color32(108, 202, 94, 255);
+
     //Initializes all labels in the UI
     public static void Initialize(GameObject[] players, GameObject scoreLabelPrefab) {
-        //Initialize stash labels
-        stashValueLabel = GameObject.Find("StashValueLabel").GetComponent<TextMeshProUGUI>();
-        stashPlayerLabel = GameObject.Find("StashPlayerLabel").GetComponent<TextMeshProUGUI>();
+        //Initialize stash label
+        stashInfoLabel = GameObject.Find("StashInfoLabel").GetComponent<TextMeshProUGUI>();
 
         //Initialize scoreboard
         scoreboard = GameObject.Find("Scoreboard");
@@ -40,15 +46,47 @@ public class LabelController : MonoBehaviour
             //Add label to scores list
             scores.Add(label);
         }
+
+        //Initialize pile counter label
+        deckPile = GameObject.Find("DeckPile");
+        discardPile = GameObject.Find("DiscardPile");
+        spillPile = GameObject.Find("SpillPile");
+        stashPile = GameObject.Find("StashPile");
+
+        //Set the deck count
+        UpdateDeckPileCounter(52);
     }
 
-    //Changes the labels based on the stash value and stash player
-    public static void ChangeStashLabels(int stashValue, Player stashPlayer) {
-        //If a card has been stashed, change stash value label to top of discard value, else change to default
-        stashValueLabel.text = (stashValue != 0) ? "Stash Value: " + stashValue : "Stash Value: ";
+    //Changes the label based on the stash value and stash player
+    public static void ChangeStashLabel(int stashValue, Player stashPlayer) {
+        if (stashValue != 0 && !(stashPlayer is null)) { //If a card has been stashed, change stash info label to show stash value and player
+            stashInfoLabel.text = "stash: " + stashPlayer.name + " stashed on " + stashValue;
+        }
+        else { //Else change to default
+            stashInfoLabel.text = "stash: ";
+        }
+    }
 
-        //If a card has been stashed, change stash player label to player who stashed, else change to default
-        stashPlayerLabel.text = (!(stashPlayer is null)) ? "Stash Player: " + stashPlayer.name : "Stash Player: ";
+    //Indicates the current playing player on the scoreboard
+    public static void HighlightCurrentPlayer(int index) {
+        if (!(index >= scores.Count)) { //Index corresponds to label in score list
+            //Highlight player
+            scores[index].color = highlightColor;
+        }
+        else { //Error
+            Debug.Log("Could not sync " + index + " to an element in the scores list");
+        }
+    }
+
+    //Returns a score label to its original text color
+    public static void UnhighlightCurrentPlayer(int index) {
+        if (!(index >= scores.Count)) { //Index corresponds to label in score list
+            //Unhighlight player
+            scores[index].color = defaultColor;
+        }
+        else { //Error
+            Debug.Log("Could not sync " + index + " to an element in the scores list");
+        }
     }
 
     //Changes the score label at the index to the new score
@@ -60,5 +98,10 @@ public class LabelController : MonoBehaviour
         else { //Error
             Debug.Log("Could not sync " + index + " to an element in the scores list");
         }
+    }
+
+    public static void UpdateDeckPileCounter(int count) {
+        TextMeshProUGUI counter = deckPile.transform.Find("Counter").GetComponentInChildren<TextMeshProUGUI>();
+        counter.text = count.ToString();
     }
 }

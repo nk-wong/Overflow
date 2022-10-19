@@ -137,6 +137,7 @@ public class GameController : MonoBehaviour {
         while (!isGameOver) {
             //Get player for turn
             Player player = playerObjs[index%NUM_PLAYERS].GetComponent<Player>();
+            LabelController.HighlightCurrentPlayer((int)index%NUM_PLAYERS);
 
             //Card management
             yield return ResolveStashPile(player);
@@ -155,6 +156,7 @@ public class GameController : MonoBehaviour {
 
             //Move on to the next player if a spill was not performed by the current player or the spill failed
             if (player.selectedMove != Move.SPILL || spill.Count == 0) {
+                LabelController.UnhighlightCurrentPlayer((int)index%NUM_PLAYERS);
                 index++;
             }
         }
@@ -229,6 +231,8 @@ public class GameController : MonoBehaviour {
         AlignPile(discard, discardObj); //Make sure the discard is showing the correct top card
         AlignPile(stash, stashObj); //Make sure the stash is the showing the correct top card
         AlignPile(spill, spillObj); //Make sure the spill is showing the correct top card
+
+        LabelController.UpdateDeckPileCounter(deck.Count);
     }
 
     private IEnumerator MoveCard(Card card, GameObject newPos, List<Card> newDeck) {
@@ -338,7 +342,7 @@ public class GameController : MonoBehaviour {
             //Set the stash value and player and notify label controller
             stashValue = discard[discard.Count - 1].value;
             stashPlayer = player;
-            LabelController.ChangeStashLabels(stashValue, stashPlayer);
+            LabelController.ChangeStashLabel(stashValue, stashPlayer);
 
             //Move the card on the top of the deck to the player's hand
             Card gain = deck[deck.Count - 1];
@@ -357,7 +361,7 @@ public class GameController : MonoBehaviour {
             //Reset the stash value and player and notify label controller
             stashValue = 0;
             stashPlayer = null;
-            LabelController.ChangeStashLabels(stashValue, stashPlayer);
+            LabelController.ChangeStashLabel(stashValue, stashPlayer);
 
             //Move the stashed card from the stash pile to the player's set
             GameObject obj = player.AddToSet(stashedCard);
