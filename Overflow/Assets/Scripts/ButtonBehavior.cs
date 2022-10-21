@@ -37,4 +37,8 @@ public class ButtonBehavior : MonoBehaviour
     public void OnPointerExit() {
         button.GetComponentInChildren<TextMeshProUGUI>().color = normalTextColor;
     }
+
+    public void ScrollTop(ScrollRect scrollRect) {
+        scrollRect.normalizedPosition = new Vector2(0, 1);
+    }
 }
