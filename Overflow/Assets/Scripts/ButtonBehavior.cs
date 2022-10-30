@@ -41,4 +41,8 @@ public class ButtonBehavior : MonoBehaviour
     public void ScrollTop(ScrollRect scrollRect) {
         scrollRect.normalizedPosition = new Vector2(0, 1);
     }
+
+    public void OpenURL(string link) {
+        Application.OpenURL(link);
+    }
 }
