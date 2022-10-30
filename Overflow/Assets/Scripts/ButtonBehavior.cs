@@ -19,6 +19,10 @@ public class ButtonBehavior : MonoBehaviour
         SceneManager.LoadScene("Rules");
     }
 
+    public void LoadCredits() {
+        SceneManager.LoadScene("Credits");
+    }
+
     public void LoadMenu() {
         SceneManager.LoadScene("Menu");
     }
