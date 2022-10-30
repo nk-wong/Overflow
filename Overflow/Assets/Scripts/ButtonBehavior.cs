@@ -19,6 +19,10 @@ public class ButtonBehavior : MonoBehaviour
         SceneManager.LoadScene("Rules");
     }
 
+    public void LoadCredits() {
+        SceneManager.LoadScene("Credits");
+    }
+
     public void LoadMenu() {
         SceneManager.LoadScene("Menu");
     }
@@ -40,5 +44,9 @@ public class ButtonBehavior : MonoBehaviour
 
     public void ScrollTop(ScrollRect scrollRect) {
         scrollRect.normalizedPosition = new Vector2(0, 1);
+    }
+
+    public void OpenURL(string link) {
+        Application.OpenURL(link);
     }
 }
