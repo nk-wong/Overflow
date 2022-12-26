@@ -40,6 +40,10 @@ public class ButtonBehavior : MonoBehaviour
         SceneManager.LoadScene("Game");
     }
 
+    public void LoadOptions() {
+        SceneManager.LoadScene("Options");
+    }
+
     public void LoadRules() {
         SceneManager.LoadScene("Rules");
     }
