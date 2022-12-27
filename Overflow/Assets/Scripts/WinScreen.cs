@@ -10,6 +10,8 @@ public class WinScreen : MonoBehaviour
     private static GameObject winScreen; //The game object panel with UI
     private static TextMeshProUGUI winnerLabel; //The label game object that shows which player won the game
 
+    private static readonly int MAX_SET_SIZE = 5;
+
     //Initialize GUI for the win screen
     public static void Initialize() {
         //Initialize the win screen panel and win screen label
@@ -26,12 +28,14 @@ public class WinScreen : MonoBehaviour
         GameController game = FindObjectOfType<GameController>();
 
         Player winner = null; //Player with the highest score
+        int winMaxSet = MAX_SET_SIZE; //The number of set cards that the winning player has
 
         //Find out which player has the highest score
         for (int i = 0; i < game.playerObjs.Length; i++) {
             Player player = game.playerObjs[i].GetComponent<Player>();
-            if (player.score == game.highestScore) { //Found player with highest score
+            if (player.score >= game.highestScore && player.SetCount() <= winMaxSet) { //Found player with highest score
                 winner = player;
+                winMaxSet = player.SetCount();
             }
         }
 
