@@ -21,6 +21,7 @@ public abstract class Player : MonoBehaviour
     public Card[] set = new Card[5]; //The player's point cards
 
     public int score { get; private set; } //The player's score
+    public int penalty = 0; //The player's penalty multiplier
 
     public Move selectedMove = Move.UNDEFINED; //The move selected by the player
     public Card selectedCard; //The card selected by the player
@@ -210,7 +211,7 @@ public abstract class Player : MonoBehaviour
 
     //Determines the player's score based on the value of the cards that have been set
     protected int CalculateScore() {
-        int sum = 0;
+        int sum = -(10 * penalty);
         for (int i = 0; i < set.Length; i++) {
             if (!(set[i] is null) && set[i].isFaceUp) {
                 sum += set[i].value;

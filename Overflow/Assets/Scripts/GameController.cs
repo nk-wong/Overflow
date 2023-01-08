@@ -369,11 +369,23 @@ public class GameController : MonoBehaviour {
 
             //The player's set is full and the last added card was a sticky card
             if (stashedCard.isFaceUp == false && player.SetCount() == player.set.Length) {
-                for (int i = 0; i < player.set.Length; i++) {
-                    if (player.set[i].isFaceUp) { //Remove face up set cards
-                        //Move non-sticky set cards to the discard
+                if (player.StickyCount() == player.set.Length) { //Player's set is all sticky cards
+                    //Increment player penalty
+                    player.penalty++;
+                    for (int i = 0; i < player.set.Length; i++) {
+                        //Move all cards to the discard
+                        player.set[i].isFaceUp = true;
                         yield return MoveToDiscard(player.set[i]);
                         player.RemoveFromSet(player.set[i]);
+                    }
+                }
+                else { //Player's set has some face up set cards
+                    for (int i = 0; i < player.set.Length; i++) {
+                        if (player.set[i].isFaceUp) { //Remove face up set cards
+                            //Move non-sticky set cards to the discard
+                            yield return MoveToDiscard(player.set[i]);
+                            player.RemoveFromSet(player.set[i]);
+                        }
                     }
                 }
             }
